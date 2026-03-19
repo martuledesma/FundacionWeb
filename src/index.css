@@ -1,41 +1,246 @@
+/* 1. VARIABLES DE MARCA */
 :root {
-  --azul: #0056b3;
-  --naranja: #ff8c00;
+    --azul-principal: #0056b3;  /* El azul del círculo del logo */
+    --naranja-logo: #ff8c00;    /* El naranja del corazón central */
+    --blanco: #ffffff;
+    --gris-fondo: #f8f9fa;
+    --texto-oscuro: #2d3436;
+    --transicion: all 0.3s ease;
+}
+
+/* 2. RESET Y ESTILOS BASE */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  font-family: sans-serif;
-  background-color: #f4f4f4;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--texto-oscuro);
+    line-height: 1.6;
+    background-color: var(--blanco);
+    scroll-behavior: smooth; /* Para que al clickear links se deslice suave */
 }
 
+/* 3. NAVEGACIÓN (Navbar) */
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 2%;
-  background: white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 2%; /* 2% lo mantiene bien pegado a la izquierda */
+    background: var(--blanco);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
 }
 
 .logo-img {
-  height: 60px;
+    height: 75px; /* Tamaño ideal para que se luzca */
+    width: auto;
+    transition: var(--transicion);
 }
 
+.logo-img:hover {
+    transform: scale(1.05); /* Efecto sutil al pasar el mouse */
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+    align-items: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--texto-oscuro);
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: var(--transicion);
+}
+
+.nav-links a:hover {
+    color: var(--azul-principal);
+}
+
+/* Botón Destacado en el Menú */
+.btn-nav {
+    background: var(--naranja-logo);
+    color: white !important;
+    padding: 10px 25px;
+    border-radius: 50px; /* Estilo redondeado moderno */
+    box-shadow: 0 4px 6px rgba(255, 140, 0, 0.3);
+}
+
+.btn-nav:hover {
+    background: #e67e00;
+    transform: translateY(-2px);
+}
+
+/* 4. HERO SECTION (Portada) */
 .hero {
-  background: var(--azul);
-  color: white;
-  padding: 80px 20px;
-  text-align: center;
+    height: 75vh;
+    background: linear-gradient(rgba(0, 86, 179, 0.75), rgba(0, 86, 179, 0.75)), 
+                url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--blanco);
+    padding: 0 20px;
 }
 
-.btn-main {
-  background: var(--naranja);
-  color: white;
-  padding: 15px 30px;
-  text-decoration: none;
-  border-radius: 5px;
-  font-weight: bold;
-  display: inline-block;
-  margin-top: 20px;
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.hero p {
+    font-size: 1.4rem;
+    max-width: 800px;
+    margin: 0 auto 30px;
+}
+
+/* 5. SECCIONES GENERALES */
+.section {
+    padding: 100px 10%;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    color: var(--azul-principal);
+    margin-bottom: 50px;
+}
+
+.bg-grey {
+    background-color: var(--gris-fondo);
+}
+
+/* 6. LISTA DE ACCIONES ANCHAS (Cards una abajo de otra) */
+
+/* Contenedor principal: Flexbox en columna para apilar las cards */
+.flex-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra las cards en la pantalla */
+    gap: 40px; /* Espacio de 40px entre cada card */
+    margin-top: 50px;
+}
+
+/* La Card Ancha */
+.card-wide {
+    display: flex; /* Flexbox horizontal para foto a la izquierda, texto a la derecha */
+    background: var(--blanco);
+    width: 80%; /* Ocupa el 80% del ancho de la sección */
+    max-width: 900px; /* Ancho máximo para que no se estire demasiado en monitores grandes */
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    overflow: hidden; /* Corta la foto para que respete los bordes redondeados */
+    transition: var(--transicion);
+    text-align: left; /* El texto se alinea a la izquierda */
+}
+
+/* Efecto al pasar el mouse */
+.card-wide:hover {
+    transform: translateY(-5px) scale(1.01); /* Se levanta un poquito y se agranda sutilmente */
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+}
+
+/* La Foto de la Card (PNGs locales) */
+.card-wide-img {
+    width: 40%; /* La foto ocupa el 40% del ancho de la card */
+    height: 300px; /* Altura fija para mantener uniformidad */
+    object-fit: cover; /* Recorta la foto sin deformarla */
+}
+
+/* Contenedor del Texto */
+.card-wide-content {
+    width: 60%; /* El texto ocupa el 60% restante */
+    padding: 40px; /* Espacio interno generoso */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centra el texto verticalmente con respecto a la foto */
+}
+
+.card-wide-content h3 {
+    color: var(--azul-principal);
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.card-wide-content p {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+/* Botón "Leer más" opcional */
+.btn-small {
+    text-decoration: none;
+    color: var(--naranja-logo);
+    font-weight: bold;
+    font-size: 0.95rem;
+    transition: var(--transicion);
+}
+
+.btn-small:hover {
+    color: var(--azul-principal);
+    text-decoration: underline;
+}
+
+/* 7. RESPONSIVE (Para celulares) */
+@media (max-width: 768px) {
+    .card-wide {
+        flex-direction: column; /* En celu, la foto va ARRIBA y el texto ABAJO */
+        width: 95%; /* Ocupa casi todo el ancho */
+    }
+
+    .card-wide-img {
+        width: 100%; /* Foto al 100% de ancho */
+        height: 200px; /* Un poco más baja */
+    }
+
+    .card-wide-content {
+        width: 100%; /* Texto al 100% de ancho */
+        padding: 25px; /* Menos espacio interno */
+    }
+
+    .card-wide-content h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* 7. FOOTER */
+footer {
+    background: #1e272e;
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+/* 8. RESPONSIVE (Para celulares) */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        padding: 20px;
+    }
+    .nav-links {
+        margin-top: 20px;
+        gap: 15px;
+    }
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+
 }

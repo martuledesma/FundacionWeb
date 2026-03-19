@@ -1,45 +1,66 @@
 import React from 'react';
-// Importamos el CSS para que la página deje de verse como texto plano
 import './index.css'; 
 import Navbar from './components/navbar';
-import InstagramFeed from './components/InstagramFeed';
 
+// 1. PRIMERO LAS IMPORTACIONES DE LAS FOTOS
+import pro1 from './Assets/pro1.png';
+import pro2 from './Assets/pro2.png';
+import pro3 from './Assets/pro3.png';
+
+// 2. AQUÍ VA EL ARRAY (AFUERA DE LA FUNCIÓN)
+const acciones = [
+  { 
+    id: 1, 
+    titulo: "Campaña Útiles Escolares", 
+    desc: "Entrega de kits para el inicio de clases en Yerba Buena.",
+    imagen: pro1 
+  },
+  { 
+    id: 2, 
+    titulo: "Colecta Tucumán", 
+    desc: "Recaudación de alimentos y ropa para familias que más lo necesitan.",
+    imagen: pro2
+  },
+  { 
+    id: 3, 
+    titulo: "Talleres Comunitarios", 
+    desc: "Espacios de aprendizaje y contención en Lola Mora y Brasil.",
+    imagen: pro3
+  }
+];
+
+// 3. EMPIEZA LA FUNCIÓN QUE DIBUJA LA WEB
 function App() {
   return (
     <div className="App">
-      {/* 1. Barra de Navegación */}
       <Navbar />
       
-      {/* 2. Sección Principal (Hero) */}
-      <header id="inicio" className="hero">
+      <header className="hero">
         <div className="hero-content">
-          <h1>Transformando realidades en Yerba Buena</h1>
-          <p>Lola Mora y Brasil - Tucumán</p>
-          <a href="#contacto" className="btn-main">Quiero Ayudar</a>
+          <h1>Fundación Construir Juntos</h1>
+          <p>Transformando realidades en Yerba Buena</p>
         </div>
       </header>
 
-      {/* 3. Feed de Instagram (Dinamismo con React) */}
-      <InstagramFeed />
-
-      {/* 4. Ubicación con Google Maps */}
-      <section id="ubicacion" className="section bg-grey">
-        <h2 className="section-title">Nuestra Ubicación</h2>
-        <div className="map-container">
-          <iframe 
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3560.123456789!2d-65.293456!3d-26.812345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjbCsDQ4JzQ0LjQiUyA2NcKwMTcnMzYuNCJX!5e0!3m2!1ses!2sar!4v1234567890" 
-            width="100%" 
-            height="450" 
-            style={{ border: 0, borderRadius: '15px' }} 
-            allowFullScreen="" 
-            loading="lazy"
-          ></iframe>
+{/* Sección de Acciones: Cambiamos 'grid' por 'flex-col' */}
+<section className="section bg-grey">
+  <h2 className="section-title">Nuestras Últimas Acciones</h2>
+  <div className="flex-col"> {/* <--- NUEVO NOMBRE DE CLASE */}
+    {acciones.map((item) => (
+      <div key={item.id} className="card-wide"> {/* <--- NUEVO NOMBRE DE CLASE */}
+        <img src={item.imagen} alt={item.titulo} className="card-wide-img" />
+        <div className="card-wide-content"> {/* Contenedor para el texto */}
+          <h3>{item.titulo}</h3>
+          <p>{item.desc}</p>
+          <a href="#mas-info" className="btn-small">Leer más</a>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
+</section>
 
-      {/* 5. Footer */}
       <footer className="footer">
-        <p>© 2026 Fundación Construir Juntos - Yerba Buena, Tucumán</p>
+        <p>© 2026 Fundación Construir Juntos - Tucumán</p>
       </footer>
     </div>
   );
