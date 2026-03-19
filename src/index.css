@@ -1,0 +1,41 @@
+:root {
+  --azul: #0056b3;
+  --naranja: #ff8c00;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 2%;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.logo-img {
+  height: 60px;
+}
+
+.hero {
+  background: var(--azul);
+  color: white;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.btn-main {
+  background: var(--naranja);
+  color: white;
+  padding: 15px 30px;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  display: inline-block;
+  margin-top: 20px;
+}
