@@ -198,7 +198,98 @@ body {
     color: var(--azul-principal);
     text-decoration: underline;
 }
+/* 9. SECCIÓN DIVIDIDA (MAPA + CALENDARIO) */
+.split-container {
+    display: flex;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: left; /* Alineamos el texto a la izquierda para esta sección */
+}
 
+.split-left, .split-right {
+    flex: 1; /* Esto hace que cada lado ocupe el 50% */
+}
+
+.section-subtitle {
+    font-size: 2rem;
+    color: var(--azul-principal);
+    margin-bottom: 30px;
+}
+
+/* Estilos específicos para el Mapa en el split */
+.map-wrapper-split {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.address-text {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #666;
+}
+
+/* Estilos para los Eventos en el split (Versión Mini) */
+.eventos-lista-split {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.evento-item-mini {
+    display: flex;
+    align-items: center;
+    background: var(--gris-fondo);
+    padding: 15px;
+    border-radius: 15px;
+    border-left: 5px solid var(--naranja-logo);
+    transition: var(--transicion);
+}
+
+.evento-item-mini:hover {
+    transform: translateX(10px);
+    background: white;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.evento-fecha-mini {
+    background: var(--azul-principal);
+    color: white;
+    padding: 8px;
+    border-radius: 10px;
+    min-width: 65px;
+    text-align: center;
+    margin-right: 15px;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+.ev-dia { font-size: 1.4rem; font-weight: bold; }
+.ev-mes { font-size: 0.7rem; }
+
+.evento-info h4 {
+    font-size: 1.1rem;
+    color: var(--azul-principal);
+    margin: 0;
+}
+
+.evento-info p {
+    font-size: 0.9rem;
+    margin: 0;
+    color: #777;
+}
+
+/* RESPONSIVE: En celulares se apilan */
+@media (max-width: 900px) {
+    .split-container {
+        flex-direction: column;
+    }
+    .section-subtitle {
+        text-align: center;
+    }
+}
 /* 7. RESPONSIVE (Para celulares) */
 @media (max-width: 768px) {
     .card-wide {
@@ -243,4 +334,41 @@ footer {
         font-size: 2.2rem;
     }
 
+}
+.contacto-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: var(--gris-fondo);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: left;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: var(--azul-principal);
+}
+
+.form-group input, .form-group textarea {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-family: inherit;
+}
+
+.form-group textarea {
+    height: 120px;
+    resize: none;
+}
+
+.info-contacto h3 {
+    color: var(--naranja-logo);
+    margin-bottom: 5px;
 }

@@ -1,22 +1,29 @@
 import React from 'react';
-// Importamos el logo desde la carpeta Assets (fijate la A mayúscula)
-import logoImg from '../Assets/logo.jpg'; 
+import { Link } from 'react-router-dom'; // <--- IMPORTANTE: Importamos el "enchufe" de rutas
+import logo from '../Assets/logo.jpg'; 
 
 const Navbar = () => {
-  return (
-    <nav className="navbar">
-      <div className="logo-container">
-        <a href="/">
-          <img src={logoImg} alt="Logo Fundación Construir Juntos" className="logo-img" />
-        </a>
-      </div>
-      <ul className="nav-links">
-        <li><a href="#inicio">Inicio</a></li>
-        <li><a href="#novedades">Novedades</a></li>
-        <li><a href="#donar" className="btn-nav">Donar Ahora</a></li>
-      </ul>
-    </nav>
-  );
+    return (
+        <nav className="navbar">
+            <div className="logo-container">
+                {/* Link a la página principal */}
+                <Link to="/">
+                    <img src={logo} alt="Logo Fundación" className="logo-img" />
+                </Link>
+            </div>
+
+            <ul className="nav-links">
+                {/* Usamos 'to' en lugar de 'href' */}
+                <li><Link to="/">Inicio</Link></li>
+                <li><Link to="/nosotros">Nosotros</Link></li>
+                
+                {/* Botón Destacado: Sumate */}
+                <li>
+                    <Link to="/sumate" className="btn-nav">Sumate</Link>
+                </li>
+            </ul>
+        </nav>
+    );
 };
 
 export default Navbar;
