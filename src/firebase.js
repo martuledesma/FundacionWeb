@@ -8,6 +8,7 @@ import {
 import {
   getFirestore,
   doc,
+  getDoc,
   onSnapshot,
   setDoc,
 } from 'firebase/firestore';
@@ -36,14 +37,26 @@ export const saveSiteContent = async (data) => setDoc(siteContentRef, data, { me
 
 const nosotrosContentRef = doc(db, 'siteContent', 'nosotros');
 export const subscribeNosotrosContent = (callback, errorCallback) => onSnapshot(nosotrosContentRef, callback, errorCallback);
+export const getNosotrosContent = async () => {
+  const snapshot = await getDoc(nosotrosContentRef);
+  return snapshot.exists() ? snapshot.data() : null;
+};
 export const saveNosotrosContent = async (data) => setDoc(nosotrosContentRef, data, { merge: true });
 
 const sumateContentRef = doc(db, 'siteContent', 'sumate');
 export const subscribeSumateContent = (callback, errorCallback) => onSnapshot(sumateContentRef, callback, errorCallback);
+export const getSumateContent = async () => {
+  const snapshot = await getDoc(sumateContentRef);
+  return snapshot.exists() ? snapshot.data() : null;
+};
 export const saveSumateContent = async (data) => setDoc(sumateContentRef, data, { merge: true });
 
 const contactoContentRef = doc(db, 'siteContent', 'contacto');
 export const subscribeContactoContent = (callback, errorCallback) => onSnapshot(contactoContentRef, callback, errorCallback);
+export const getContactoContent = async () => {
+  const snapshot = await getDoc(contactoContentRef);
+  return snapshot.exists() ? snapshot.data() : null;
+};
 export const saveContactoContent = async (data) => setDoc(contactoContentRef, data, { merge: true });
 
 export const uploadImage = async (file, path) => {

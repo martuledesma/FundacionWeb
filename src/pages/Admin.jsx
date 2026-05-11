@@ -170,7 +170,7 @@ const Admin = ({ user, content, loading, onSave }) => {
       } else if (activeTab === 'contacto') {
         await saveContactoContent(contactoContent);
       }
-      setSuccessMessage('Contenido guardado correctamente.');
+      setSuccessMessage('El cambio se efectuó correctamente.');
     } catch (err) {
       console.error('Save error:', err);
       setError(`No se pudo guardar. ${err?.message || 'Revisa la conexión o configuración de Firebase.'}`);

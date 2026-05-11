@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { subscribeSumateContent } from '../firebase';
+import { getSumateContent } from '../firebase';
 
 const Sumate = () => {
   const [content, setContent] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = subscribeSumateContent(
-      (snapshot) => {
-        if (snapshot.exists()) {
-          setContent(snapshot.data());
+    const loadContent = async () => {
+      try {
+        const data = await getSumateContent();
+        if (data) {
+          setContent(data);
         }
-        setLoading(false);
-      },
-      (error) => {
+      } catch (error) {
         console.error('Error loading sumate content:', error);
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    return unsubscribe;
+    loadContent();
   }, []);
 
   if (loading) {

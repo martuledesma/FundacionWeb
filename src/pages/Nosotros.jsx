@@ -1,25 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { subscribeNosotrosContent } from '../firebase';
+import { getNosotrosContent } from '../firebase';
 
 function Nosotros() {
   const [content, setContent] = useState({});
   const [loading, setLoading] = useState(true);
+  const [expandedMembers, setExpandedMembers] = useState({});
+
+  const toggleMemberExpand = (index) => {
+    setExpandedMembers((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
 
   useEffect(() => {
-    const unsubscribe = subscribeNosotrosContent(
-      (snapshot) => {
-        if (snapshot.exists()) {
-          setContent(snapshot.data());
+    const loadContent = async () => {
+      try {
+        const data = await getNosotrosContent();
+        if (data) {
+          setContent(data);
         }
-        setLoading(false);
-      },
-      (error) => {
+      } catch (error) {
         console.error('Error loading nosotros content:', error);
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    return unsubscribe;
+    loadContent();
   }, []);
 
   if (loading) {
@@ -64,7 +72,18 @@ function Nosotros() {
                 )}
                 <div className="team-info">
                   <h3>{member.nombre}</h3>
-                  <p>{member.descripcion}</p>
+                  <p className={expandedMembers[index] ? 'team-description expanded' : 'team-description'}>
+                    {member.descripcion}
+                  </p>
+                  {member.descripcion && member.descripcion.length > 140 && (
+                    <button
+                      type="button"
+                      className="btn-small team-toggle"
+                      onClick={() => toggleMemberExpand(index)}
+                    >
+                      {expandedMembers[index] ? 'Ver menos' : 'Ver más'}
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

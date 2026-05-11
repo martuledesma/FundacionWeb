@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { subscribeContactoContent } from '../firebase';
+import { getContactoContent } from '../firebase';
 
 const Contacto = () => {
   const [content, setContent] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = subscribeContactoContent(
-      (snapshot) => {
-        if (snapshot.exists()) {
-          setContent(snapshot.data());
+    const loadContent = async () => {
+      try {
+        const data = await getContactoContent();
+        if (data) {
+          setContent(data);
         }
-        setLoading(false);
-      },
-      (error) => {
+      } catch (error) {
         console.error('Error loading contacto content:', error);
+      } finally {
         setLoading(false);
       }
-    );
+    };
 
-    return unsubscribe;
+    loadContent();
   }, []);
 
   if (loading) {

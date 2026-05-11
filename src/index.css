@@ -306,6 +306,25 @@ body {
     overflow: hidden;
 }
 
+.team-description.expanded {
+    display: block;
+    -webkit-line-clamp: unset;
+}
+
+.team-toggle {
+    margin-top: 10px;
+    background: transparent;
+    border: none;
+    color: var(--azul-principal);
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.team-toggle:hover {
+    color: #004080;
+}
+
 /* RESPONSIVE: Para las cards del equipo en móviles */
 @media (max-width: 768px) {
     .team-grid {
