@@ -39,29 +39,32 @@ function Nosotros() {
   }
 
   return (
-    <div className="section">
-      <h1 className="section-title">{content.title || 'Sobre la Fundación'}</h1>
-
-      {/* Contenido principal */}
-      <div className="flex-col">
-        <div className="card-wide">
-          <div className="card-wide-content">
-            <p style={{ whiteSpace: 'pre-wrap' }}>
-              {content.content || 'Somos un grupo de vecinos de Yerba Buena trabajando por el bien común...'}
-            </p>
-            {content.additionalText && (
-              <p style={{ marginTop: '20px', whiteSpace: 'pre-wrap' }}>
-                {content.additionalText}
-              </p>
-            )}
-          </div>
+    <div className="nosotros-page">
+      <header className="nosotros-hero">
+        <div className="nosotros-hero-content">
+          <h1>{content.title || 'Sobre la Fundación'}</h1>
+          <p>
+            {content.heroSubtitle || 'Construimos comunidad con compromiso, cercanía y trabajo compartido.'}
+          </p>
         </div>
-      </div>
+      </header>
+
+      <section className="nosotros-content">
+        <div className="nosotros-text">
+          <p>
+            {content.content || 'Somos un grupo de vecinos de Yerba Buena trabajando por el bien común...'}
+          </p>
+          {content.additionalText && (
+            <p>
+              {content.additionalText}
+            </p>
+          )}
+        </div>
+      </section>
 
       {/* Sección del equipo */}
       {content.teamCards && content.teamCards.length > 0 && (
         <div className="team-section">
-          <h2 className="section-subtitle">Nuestro Equipo</h2>
           <div className="team-grid">
             {content.teamCards.map((member, index) => (
               <div className="team-card" key={member.id || index}>

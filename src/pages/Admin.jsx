@@ -12,7 +12,13 @@ import {
   saveSumateContent,
   subscribeContactoContent,
   saveContactoContent,
+  subscribeProyectosContent,
+  saveProyectosContent,
+  subscribeCursosContent,
+  saveCursosContent,
 } from '../firebase';
+
+const statusOptions = ['Activo', 'Últimos cupos', 'Finalizado'];
 
 const Admin = ({ user, content, loading, onSave }) => {
   const [email, setEmail] = useState('');
@@ -21,10 +27,13 @@ const Admin = ({ user, content, loading, onSave }) => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [activeTab, setActiveTab] = useState('homepage');
+  const [openItems, setOpenItems] = useState({});
 
   const [nosotrosContent, setNosotrosContent] = useState({});
   const [sumateContent, setSumateContent] = useState({});
   const [contactoContent, setContactoContent] = useState({});
+  const [proyectosContent, setProyectosContent] = useState({});
+  const [cursosContent, setCursosContent] = useState({});
 
   useEffect(() => {
     if (content) {
@@ -42,9 +51,7 @@ const Admin = ({ user, content, loading, onSave }) => {
 
     const unsubscribeSumate = subscribeSumateContent(
       (snapshot) => {
-        if (snapshot.exists()) {
-          setSumateContent(snapshot.data());
-        }
+        setSumateContent(snapshot.exists() ? snapshot.data() : { carouselImages: [] });
       },
       (error) => console.error('Sumate content error:', error)
     );
@@ -58,10 +65,26 @@ const Admin = ({ user, content, loading, onSave }) => {
       (error) => console.error('Contacto content error:', error)
     );
 
+    const unsubscribeProyectos = subscribeProyectosContent(
+      (snapshot) => {
+        setProyectosContent(snapshot.exists() ? snapshot.data() : { items: [] });
+      },
+      (error) => console.error('Proyectos content error:', error)
+    );
+
+    const unsubscribeCursos = subscribeCursosContent(
+      (snapshot) => {
+        setCursosContent(snapshot.exists() ? snapshot.data() : { items: [] });
+      },
+      (error) => console.error('Cursos content error:', error)
+    );
+
     return () => {
       unsubscribeNosotros();
       unsubscribeSumate();
       unsubscribeContacto();
+      unsubscribeProyectos();
+      unsubscribeCursos();
     };
   }, []);
 
@@ -96,6 +119,10 @@ const Admin = ({ user, content, loading, onSave }) => {
       setSumateContent((prev) => ({ ...prev, [field]: value }));
     } else if (page === 'contacto') {
       setContactoContent((prev) => ({ ...prev, [field]: value }));
+    } else if (page === 'proyectos') {
+      setProyectosContent((prev) => ({ ...prev, [field]: value }));
+    } else if (page === 'cursos') {
+      setCursosContent((prev) => ({ ...prev, [field]: value }));
     }
   };
 
@@ -126,20 +153,145 @@ const Admin = ({ user, content, loading, onSave }) => {
     }));
   };
 
-
-
-  const addNewCard = () => {
-    setFormState((prev) => ({
+  const updateSumateCarouselImage = (index, field, value) => {
+    setSumateContent((prev) => ({
       ...prev,
-      cards: [...(prev.cards || []), { id: Date.now(), titulo: '', desc: '', imagen: '' }],
+      carouselImages: (prev.carouselImages || []).map((image, idx) =>
+        idx === index ? { ...image, [field]: value } : image
+      ),
     }));
   };
 
+  const updateProyecto = (index, field, value) => {
+    setProyectosContent((prev) => ({
+      ...prev,
+      items: (prev.items || []).map((item, idx) =>
+        idx === index ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const updateCurso = (index, field, value) => {
+    setCursosContent((prev) => ({
+      ...prev,
+      items: (prev.items || []).map((item, idx) =>
+        idx === index ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const getItemKey = (section, item, index) => `${section}-${item?.id || index}`;
+
+  const openItem = (section, item, index = 0) => {
+    const key = getItemKey(section, item, index);
+    setOpenItems((prev) => ({ ...prev, [key]: true }));
+  };
+
+  const toggleItem = (section, item, index) => {
+    const key = getItemKey(section, item, index);
+    setOpenItems((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const isItemOpen = (section, item, index) => Boolean(openItems[getItemKey(section, item, index)]);
+
+  const renderEditableItem = ({
+    section,
+    item,
+    index,
+    title,
+    summary,
+    onDelete,
+    children,
+    className = 'editor-card',
+  }) => {
+    const open = isItemOpen(section, item, index);
+
+    return (
+      <div className={`${className} ${open ? 'is-open' : ''}`} key={item?.id || index}>
+        <div className="editor-item-header">
+          <div className="editor-item-title">
+            <h4>{title}</h4>
+            {summary && <p>{summary}</p>}
+          </div>
+          <div className="editor-item-actions">
+            <button
+              type="button"
+              className="btn-edit"
+              onClick={() => toggleItem(section, item, index)}
+              aria-label={open ? `Cerrar edición de ${title}` : `Editar ${title}`}
+              title={open ? 'Cerrar' : 'Editar'}
+            >
+              {open ? '▴' : '✎'}
+            </button>
+            {onDelete && (
+              <button
+                type="button"
+                className="btn-delete compact"
+                onClick={onDelete}
+                aria-label={`Eliminar ${title}`}
+                title="Eliminar"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+        {open && <div className="editor-item-body">{children}</div>}
+      </div>
+    );
+  };
+
+
+
+  const addNewCard = () => {
+    const newCard = { id: Date.now(), titulo: '', desc: '', imagen: '' };
+    setFormState((prev) => ({
+      ...prev,
+      cards: [newCard, ...(prev.cards || [])],
+    }));
+    openItem('home-cards', newCard);
+  };
+
   const addNewNosotrosCard = () => {
+    const newMember = { id: Date.now(), nombre: '', descripcion: '', imagen: '' };
     setNosotrosContent((prev) => ({
       ...prev,
-      teamCards: [...(prev.teamCards || []), { id: Date.now(), nombre: '', descripcion: '', imagen: '' }],
+      teamCards: [newMember, ...(prev.teamCards || [])],
     }));
+    openItem('nosotros-team', newMember);
+  };
+
+  const addNewSumateCarouselImage = () => {
+    const newImage = { id: Date.now(), url: '', alt: '' };
+    setSumateContent((prev) => ({
+      ...prev,
+      carouselImages: [newImage, ...(prev.carouselImages || [])],
+    }));
+    openItem('sumate-carousel', newImage);
+  };
+
+  const addNewProyecto = () => {
+    const newProject = { id: Date.now(), titulo: '', descripcion: '', imagen: '', estado: 'Activo' };
+    setProyectosContent((prev) => ({
+      ...prev,
+      items: [
+        newProject,
+        ...(prev.items || []),
+      ],
+    }));
+    openItem('proyectos-items', newProject);
+  };
+
+  const addNewCurso = () => {
+    const newCourse = { id: Date.now(), nombre: '', descripcion: '', imagen: '', fecha: '', lugar: '', estado: 'Activo', link: '' };
+    setCursosContent((prev) => ({
+      ...prev,
+      items: [
+        newCourse,
+        ...(prev.items || []),
+      ],
+    }));
+    openItem('cursos-items', newCourse);
   };
 
   const deleteCard = (index) => {
@@ -149,10 +301,38 @@ const Admin = ({ user, content, loading, onSave }) => {
     }));
   };
 
+  const deleteEvent = (index) => {
+    setFormState((prev) => ({
+      ...prev,
+      events: (prev.events || []).filter((_, idx) => idx !== index),
+    }));
+  };
+
   const deleteNosotrosCard = (index) => {
     setNosotrosContent((prev) => ({
       ...prev,
       teamCards: (prev.teamCards || []).filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const deleteSumateCarouselImage = (index) => {
+    setSumateContent((prev) => ({
+      ...prev,
+      carouselImages: (prev.carouselImages || []).filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const deleteProyecto = (index) => {
+    setProyectosContent((prev) => ({
+      ...prev,
+      items: (prev.items || []).filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const deleteCurso = (index) => {
+    setCursosContent((prev) => ({
+      ...prev,
+      items: (prev.items || []).filter((_, idx) => idx !== index),
     }));
   };
 
@@ -169,6 +349,10 @@ const Admin = ({ user, content, loading, onSave }) => {
         await saveSumateContent(sumateContent);
       } else if (activeTab === 'contacto') {
         await saveContactoContent(contactoContent);
+      } else if (activeTab === 'proyectos') {
+        await saveProyectosContent(proyectosContent);
+      } else if (activeTab === 'cursos') {
+        await saveCursosContent(cursosContent);
       }
       setSuccessMessage('El cambio se efectuó correctamente.');
     } catch (err) {
@@ -219,7 +403,7 @@ const Admin = ({ user, content, loading, onSave }) => {
         </form>
 
         <p className="admin-note">
-          Solo el administrador podrá modificar las cards, eventos y textos.
+          Solo el administrador podrá modificar novedades, eventos y textos.
         </p>
         <p className="admin-note">
           Asegúrate de habilitar Email/Password en Firebase Auth y de que el usuario exista con el email {ADMIN_EMAIL}.
@@ -291,13 +475,20 @@ const Admin = ({ user, content, loading, onSave }) => {
             </div>
 
             <div className="editor-block">
-              <h3>Cards destacadas</h3>
+              <h3>Carrusel de novedades</h3>
+              <p className="admin-note">Cada novedad se muestra como una diapositiva del carrusel de inicio.</p>
               <button className="btn-nav" onClick={addNewCard}>
-                Agregar nueva card
+                Agregar nueva novedad arriba
               </button>
-              {formState?.cards?.map((card, index) => (
-                <div className="editor-card" key={card.id || index}>
-                  <h4>Card {card.id || index + 1}</h4>
+              {formState?.cards?.map((card, index) => renderEditableItem({
+                section: 'home-cards',
+                item: card,
+                index,
+                title: card.titulo || `Novedad ${index + 1}`,
+                summary: card.desc || 'Sin descripción cargada',
+                onDelete: () => deleteCard(index),
+                children: (
+                  <>
                   <label>
                     Título
                     <input
@@ -328,18 +519,23 @@ const Admin = ({ user, content, loading, onSave }) => {
                       <img src={card.imagen} alt="Preview" style={{ maxWidth: '200px', marginTop: '10px', borderRadius: '8px' }} />
                     </label>
                   )}
-                  <button className="btn-delete" onClick={() => deleteCard(index)}>
-                    Eliminar card
-                  </button>
-                </div>
-              ))}
+                  </>
+                ),
+              }))}
             </div>
 
             <div className="editor-block">
               <h3>Eventos del calendario</h3>
-              {formState?.events?.map((event, index) => (
-                <div className="editor-event" key={event.id || index}>
-                  <h4>Evento {event.id || index + 1}</h4>
+              {formState?.events?.map((event, index) => renderEditableItem({
+                section: 'home-events',
+                item: event,
+                index,
+                title: event.titulo || `Evento ${index + 1}`,
+                summary: [event.fecha, event.lugar].filter(Boolean).join(' · ') || 'Sin fecha ni lugar cargados',
+                onDelete: () => deleteEvent(index),
+                className: 'editor-event',
+                children: (
+                  <>
                   <label>
                     Fecha
                     <input
@@ -364,8 +560,9 @@ const Admin = ({ user, content, loading, onSave }) => {
                       onChange={(e) => updateEvent(index, 'lugar', e.target.value)}
                     />
                   </label>
-                </div>
-              ))}
+                  </>
+                ),
+              }))}
             </div>
 
             <div className="editor-block">
@@ -404,6 +601,14 @@ const Admin = ({ user, content, loading, onSave }) => {
                 />
               </label>
               <label>
+                Subtítulo del bloque azul
+                <input
+                  type="text"
+                  value={nosotrosContent?.heroSubtitle || ''}
+                  onChange={(e) => updateField('heroSubtitle', e.target.value, 'nosotros')}
+                />
+              </label>
+              <label>
                 Contenido principal
                 <textarea
                   rows="10"
@@ -424,11 +629,17 @@ const Admin = ({ user, content, loading, onSave }) => {
             <div className="editor-block">
               <h3>Equipo - Miembros</h3>
               <button className="btn-nav" onClick={addNewNosotrosCard}>
-                Agregar nuevo miembro
+                Agregar nuevo miembro arriba
               </button>
-              {nosotrosContent?.teamCards?.map((card, index) => (
-                <div className="editor-card" key={card.id || index}>
-                  <h4>Miembro {card.id || index + 1}</h4>
+              {nosotrosContent?.teamCards?.map((card, index) => renderEditableItem({
+                section: 'nosotros-team',
+                item: card,
+                index,
+                title: card.nombre || `Miembro ${index + 1}`,
+                summary: card.descripcion || 'Sin descripción cargada',
+                onDelete: () => deleteNosotrosCard(index),
+                children: (
+                  <>
                   <label>
                     Nombre
                     <input
@@ -459,44 +670,313 @@ const Admin = ({ user, content, loading, onSave }) => {
                       <img src={card.imagen} alt="Preview" style={{ maxWidth: '200px', marginTop: '10px', borderRadius: '8px' }} />
                     </label>
                   )}
-                  <button className="btn-delete" onClick={() => deleteNosotrosCard(index)}>
-                    Eliminar miembro
-                  </button>
-                </div>
-              ))}
+                  </>
+                ),
+              }))}
             </div>
           </>
         );
 
       case 'sumate':
         return (
-          <div className="editor-block">
-            <h3>Contenido de la página "Sumate"</h3>
-            <label>
-              Título principal
-              <input
-                type="text"
-                value={sumateContent?.title || ''}
-                onChange={(e) => updateField('title', e.target.value, 'sumate')}
-              />
-            </label>
-            <label>
-              Contenido principal
-              <textarea
-                rows="10"
-                value={sumateContent?.content || ''}
-                onChange={(e) => updateField('content', e.target.value, 'sumate')}
-              />
-            </label>
-            <label>
-              Información de contacto
-              <textarea
-                rows="5"
-                value={sumateContent?.contactInfo || ''}
-                onChange={(e) => updateField('contactInfo', e.target.value, 'sumate')}
-              />
-            </label>
-          </div>
+          <>
+            <div className="editor-block">
+              <h3>Contenido de la página "Sumate"</h3>
+              <label>
+                Título principal
+                <input
+                  type="text"
+                  value={sumateContent?.title || ''}
+                  onChange={(e) => updateField('title', e.target.value, 'sumate')}
+                />
+              </label>
+              <label>
+                Subtítulo del bloque azul
+                <input
+                  type="text"
+                  value={sumateContent?.heroSubtitle || ''}
+                  onChange={(e) => updateField('heroSubtitle', e.target.value, 'sumate')}
+                />
+              </label>
+              <label>
+                Contenido principal
+                <textarea
+                  rows="10"
+                  value={sumateContent?.content || ''}
+                  onChange={(e) => updateField('content', e.target.value, 'sumate')}
+                />
+              </label>
+              <label>
+                Información de contacto
+                <textarea
+                  rows="5"
+                  value={sumateContent?.contactInfo || ''}
+                  onChange={(e) => updateField('contactInfo', e.target.value, 'sumate')}
+                />
+              </label>
+            </div>
+
+            <div className="editor-block">
+              <h3>Fotos del carrusel</h3>
+              <button className="btn-nav" onClick={addNewSumateCarouselImage}>
+                Agregar foto arriba
+              </button>
+              {sumateContent?.carouselImages?.map((image, index) => renderEditableItem({
+                section: 'sumate-carousel',
+                item: image,
+                index,
+                title: image.alt || `Foto ${index + 1}`,
+                summary: image.url || 'Sin URL cargada',
+                onDelete: () => deleteSumateCarouselImage(index),
+                children: (
+                  <>
+                  <label>
+                    URL de la imagen
+                    <input
+                      type="url"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                      value={image.url || ''}
+                      onChange={(e) => updateSumateCarouselImage(index, 'url', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Texto alternativo
+                    <input
+                      type="text"
+                      placeholder="Descripción breve de la imagen"
+                      value={image.alt || ''}
+                      onChange={(e) => updateSumateCarouselImage(index, 'alt', e.target.value)}
+                    />
+                  </label>
+                  {image.url && (
+                    <label>
+                      Preview
+                      <img src={image.url} alt="Preview carrusel" style={{ maxWidth: '240px', marginTop: '10px', borderRadius: '8px' }} />
+                    </label>
+                  )}
+                  </>
+                ),
+              }))}
+            </div>
+          </>
+        );
+
+      case 'proyectos':
+        return (
+          <>
+            <div className="editor-block">
+              <h3>Contenido de la página "Proyectos"</h3>
+              <label>
+                Título principal
+                <input
+                  type="text"
+                  value={proyectosContent?.title || ''}
+                  onChange={(e) => updateField('title', e.target.value, 'proyectos')}
+                />
+              </label>
+              <label>
+                Subtítulo del bloque azul
+                <input
+                  type="text"
+                  value={proyectosContent?.heroSubtitle || ''}
+                  onChange={(e) => updateField('heroSubtitle', e.target.value, 'proyectos')}
+                />
+              </label>
+              <label>
+                Texto introductorio
+                <textarea
+                  rows="4"
+                  value={proyectosContent?.introText || ''}
+                  onChange={(e) => updateField('introText', e.target.value, 'proyectos')}
+                />
+              </label>
+            </div>
+
+            <div className="editor-block">
+              <h3>Listado de proyectos</h3>
+              <button className="btn-nav" onClick={addNewProyecto}>
+                Agregar proyecto arriba
+              </button>
+              {proyectosContent?.items?.map((item, index) => renderEditableItem({
+                section: 'proyectos-items',
+                item,
+                index,
+                title: item.titulo || `Proyecto ${index + 1}`,
+                summary: [item.estado, item.descripcion].filter(Boolean).join(' · ') || 'Sin descripción cargada',
+                onDelete: () => deleteProyecto(index),
+                children: (
+                  <>
+                  <label>
+                    Título
+                    <input
+                      type="text"
+                      value={item.titulo || ''}
+                      onChange={(e) => updateProyecto(index, 'titulo', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Descripción
+                    <textarea
+                      value={item.descripcion || ''}
+                      onChange={(e) => updateProyecto(index, 'descripcion', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Estado
+                    <select
+                      value={item.estado || ''}
+                      onChange={(e) => updateProyecto(index, 'estado', e.target.value)}
+                    >
+                      <option value="">Seleccionar estado</option>
+                      {statusOptions.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    URL de la imagen
+                    <input
+                      type="url"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                      value={item.imagen || ''}
+                      onChange={(e) => updateProyecto(index, 'imagen', e.target.value)}
+                    />
+                  </label>
+                  {item.imagen && (
+                    <label>
+                      Preview
+                      <img src={item.imagen} alt="Preview proyecto" style={{ maxWidth: '240px', marginTop: '10px', borderRadius: '8px' }} />
+                    </label>
+                  )}
+                  </>
+                ),
+              }))}
+            </div>
+          </>
+        );
+
+      case 'cursos':
+        return (
+          <>
+            <div className="editor-block">
+              <h3>Contenido de la página "Cursos y Talleres"</h3>
+              <label>
+                Título principal
+                <input
+                  type="text"
+                  value={cursosContent?.title || ''}
+                  onChange={(e) => updateField('title', e.target.value, 'cursos')}
+                />
+              </label>
+              <label>
+                Subtítulo del bloque azul
+                <input
+                  type="text"
+                  value={cursosContent?.heroSubtitle || ''}
+                  onChange={(e) => updateField('heroSubtitle', e.target.value, 'cursos')}
+                />
+              </label>
+              <label>
+                Texto introductorio
+                <textarea
+                  rows="4"
+                  value={cursosContent?.introText || ''}
+                  onChange={(e) => updateField('introText', e.target.value, 'cursos')}
+                />
+              </label>
+            </div>
+
+            <div className="editor-block">
+              <h3>Listado de cursos y talleres</h3>
+              <button className="btn-nav" onClick={addNewCurso}>
+                Agregar curso o taller arriba
+              </button>
+              {cursosContent?.items?.map((item, index) => renderEditableItem({
+                section: 'cursos-items',
+                item,
+                index,
+                title: item.nombre || `Curso/Taller ${index + 1}`,
+                summary: [item.estado, item.fecha, item.lugar].filter(Boolean).join(' · ') || 'Sin fecha ni lugar cargados',
+                onDelete: () => deleteCurso(index),
+                children: (
+                  <>
+                  <label>
+                    Nombre
+                    <input
+                      type="text"
+                      value={item.nombre || ''}
+                      onChange={(e) => updateCurso(index, 'nombre', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Descripción
+                    <textarea
+                      value={item.descripcion || ''}
+                      onChange={(e) => updateCurso(index, 'descripcion', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Fecha o frecuencia
+                    <input
+                      type="text"
+                      placeholder="Sábados, Próximamente, 12/06..."
+                      value={item.fecha || ''}
+                      onChange={(e) => updateCurso(index, 'fecha', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Lugar
+                    <input
+                      type="text"
+                      value={item.lugar || ''}
+                      onChange={(e) => updateCurso(index, 'lugar', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Estado
+                    <select
+                      value={item.estado || ''}
+                      onChange={(e) => updateCurso(index, 'estado', e.target.value)}
+                    >
+                      <option value="">Seleccionar estado</option>
+                      {statusOptions.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    Link de inscripción
+                    <input
+                      type="url"
+                      placeholder="https://..."
+                      value={item.link || ''}
+                      onChange={(e) => updateCurso(index, 'link', e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    URL de la imagen
+                    <input
+                      type="url"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                      value={item.imagen || ''}
+                      onChange={(e) => updateCurso(index, 'imagen', e.target.value)}
+                    />
+                  </label>
+                  {item.imagen && (
+                    <label>
+                      Preview
+                      <img src={item.imagen} alt="Preview curso" style={{ maxWidth: '240px', marginTop: '10px', borderRadius: '8px' }} />
+                    </label>
+                  )}
+                  </>
+                ),
+              }))}
+            </div>
+          </>
         );
 
       case 'contacto':
@@ -589,6 +1069,18 @@ const Admin = ({ user, content, loading, onSave }) => {
           onClick={() => setActiveTab('sumate')}
         >
           Sumate
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'proyectos' ? 'active' : ''}`}
+          onClick={() => setActiveTab('proyectos')}
+        >
+          Proyectos
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'cursos' ? 'active' : ''}`}
+          onClick={() => setActiveTab('cursos')}
+        >
+          Cursos
         </button>
         <button
           className={`tab-button ${activeTab === 'contacto' ? 'active' : ''}`}

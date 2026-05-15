@@ -59,6 +59,22 @@ export const getContactoContent = async () => {
 };
 export const saveContactoContent = async (data) => setDoc(contactoContentRef, data, { merge: true });
 
+const proyectosContentRef = doc(db, 'siteContent', 'proyectos');
+export const subscribeProyectosContent = (callback, errorCallback) => onSnapshot(proyectosContentRef, callback, errorCallback);
+export const getProyectosContent = async () => {
+  const snapshot = await getDoc(proyectosContentRef);
+  return snapshot.exists() ? snapshot.data() : null;
+};
+export const saveProyectosContent = async (data) => setDoc(proyectosContentRef, data, { merge: true });
+
+const cursosContentRef = doc(db, 'siteContent', 'cursos');
+export const subscribeCursosContent = (callback, errorCallback) => onSnapshot(cursosContentRef, callback, errorCallback);
+export const getCursosContent = async () => {
+  const snapshot = await getDoc(cursosContentRef);
+  return snapshot.exists() ? snapshot.data() : null;
+};
+export const saveCursosContent = async (data) => setDoc(cursosContentRef, data, { merge: true });
+
 export const uploadImage = async (file, path) => {
   const storageRef = ref(storage, path);
   const snapshot = await uploadBytes(storageRef, file);
