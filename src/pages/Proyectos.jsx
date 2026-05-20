@@ -42,6 +42,14 @@ const getStatusLabel = (status) => (
 const Proyectos = () => {
   const [content, setContent] = useState({});
   const [loading, setLoading] = useState(true);
+  const [expandedProjects, setExpandedProjects] = useState({});
+
+  const toggleProjectExpand = (index) => {
+    setExpandedProjects((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
 
   useEffect(() => {
     const loadContent = async () => {
@@ -72,12 +80,24 @@ const Proyectos = () => {
 
   return (
     <div className="proyectos-page">
-      <header className="page-hero">
+      <header
+        className="page-hero page-hero-photo"
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${content.heroImage || projects[0]?.imagen || pro1}')`,
+        }}
+      >
         <div className="page-hero-content">
-          <h1>{content.title || 'Conocé nuestros proyectos'}</h1>
-          <p>
-            {content.heroSubtitle || 'Impulsamos iniciativas que acompañan, fortalecen y generan oportunidades en la comunidad.'}
-          </p>
+          <div className="page-hero-copy">
+            <span className="page-eyebrow">Proyectos</span>
+            <h1>{content.title || 'Conocé nuestros proyectos'}</h1>
+            <p>
+              {content.heroSubtitle || 'Impulsamos iniciativas que acompañan, fortalecen y generan oportunidades en la comunidad.'}
+            </p>
+          </div>
+          <div className="page-hero-card">
+            <span>{projects.length}+ iniciativas</span>
+            <strong>Acciones sostenidas junto a vecinos, instituciones y voluntarios.</strong>
+          </div>
         </div>
       </header>
 
@@ -98,7 +118,18 @@ const Proyectos = () => {
                 <span className={getStatusClass(project.estado)}>{getStatusLabel(project.estado)}</span>
               )}
               <h2>{project.titulo}</h2>
-              <p>{project.descripcion}</p>
+              <p className={expandedProjects[index] ? 'feature-description expanded' : 'feature-description'}>
+                {project.descripcion}
+              </p>
+              {project.descripcion && (
+                <button
+                  type="button"
+                  className="btn-small feature-toggle"
+                  onClick={() => toggleProjectExpand(index)}
+                >
+                  {expandedProjects[index] ? 'Ver menos' : 'Ver más'}
+                </button>
+              )}
             </div>
           </article>
         ))}

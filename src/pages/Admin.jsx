@@ -241,6 +241,25 @@ const Admin = ({ user, content, loading, onSave }) => {
     );
   };
 
+  const renderHeroImageField = (pageContent, page) => (
+    <label>
+      URL de la imagen de portada
+      <input
+        type="url"
+        placeholder="https://ejemplo.com/portada.jpg"
+        value={pageContent?.heroImage || ''}
+        onChange={(e) => updateField('heroImage', e.target.value, page)}
+      />
+      {pageContent?.heroImage && (
+        <img
+          src={pageContent.heroImage}
+          alt="Preview portada"
+          style={{ maxWidth: '400px', marginTop: '10px', borderRadius: '8px', display: 'block' }}
+        />
+      )}
+    </label>
+  );
+
 
 
   const addNewCard = () => {
@@ -354,7 +373,7 @@ const Admin = ({ user, content, loading, onSave }) => {
       } else if (activeTab === 'cursos') {
         await saveCursosContent(cursosContent);
       }
-      setSuccessMessage('El cambio se efectuó correctamente.');
+      setSuccessMessage('Se ha guardado correctamente.');
     } catch (err) {
       console.error('Save error:', err);
       setError(`No se pudo guardar. ${err?.message || 'Revisa la conexión o configuración de Firebase.'}`);
@@ -600,6 +619,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                   onChange={(e) => updateField('title', e.target.value, 'nosotros')}
                 />
               </label>
+              {renderHeroImageField(nosotrosContent, 'nosotros')}
               <label>
                 Subtítulo del bloque azul
                 <input
@@ -690,6 +710,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                   onChange={(e) => updateField('title', e.target.value, 'sumate')}
                 />
               </label>
+              {renderHeroImageField(sumateContent, 'sumate')}
               <label>
                 Subtítulo del bloque azul
                 <input
@@ -774,6 +795,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                   onChange={(e) => updateField('title', e.target.value, 'proyectos')}
                 />
               </label>
+              {renderHeroImageField(proyectosContent, 'proyectos')}
               <label>
                 Subtítulo del bloque azul
                 <input
@@ -870,6 +892,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                   onChange={(e) => updateField('title', e.target.value, 'cursos')}
                 />
               </label>
+              {renderHeroImageField(cursosContent, 'cursos')}
               <label>
                 Subtítulo del bloque azul
                 <input
@@ -983,6 +1006,7 @@ const Admin = ({ user, content, loading, onSave }) => {
         return (
           <div className="editor-block">
             <h3>Contenido de la página "Contacto"</h3>
+            {renderHeroImageField(contactoContent, 'contacto')}
             <label>
               Título de introducción
               <input
@@ -1091,13 +1115,39 @@ const Admin = ({ user, content, loading, onSave }) => {
       </div>
 
       {error && <p className="form-error">{error}</p>}
-      {successMessage && <p className="form-success">{successMessage}</p>}
 
       {renderTabContent()}
 
       <button className="btn-nav" onClick={handleSave}>
         Guardar cambios
       </button>
+
+      {successMessage && (
+        <div className="save-modal" role="dialog" aria-modal="true" aria-labelledby="save-modal-title">
+          <button
+            type="button"
+            className="save-modal-backdrop"
+            onClick={() => setSuccessMessage('')}
+            aria-label="Cerrar aviso"
+          />
+          <div className="save-modal-content">
+            <button
+              type="button"
+              className="save-modal-close"
+              onClick={() => setSuccessMessage('')}
+              aria-label="Cerrar aviso"
+            >
+              ×
+            </button>
+            <div className="save-modal-icon" aria-hidden="true">✓</div>
+            <h3 id="save-modal-title">{successMessage}</h3>
+            <p>Los cambios ya están actualizados en el sitio.</p>
+            <button type="button" className="btn-nav" onClick={() => setSuccessMessage('')}>
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

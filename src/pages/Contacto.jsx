@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getContactoContent } from '../firebase';
+import pro4 from '../Assets/pro4.PNG';
 
 const Contacto = () => {
   const [content, setContent] = useState({});
@@ -30,10 +31,30 @@ const Contacto = () => {
     );
   }
 
-  return (
-    <div className="section">
-      <h2 className="section-title">Contacto</h2>
+  const heroImage = content.heroImage || pro4;
 
+  return (
+    <div className="contacto-page">
+      <header
+        className="page-hero page-hero-photo"
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+        }}
+      >
+        <div className="page-hero-content">
+          <div className="page-hero-copy">
+            <span className="page-eyebrow">Contacto</span>
+            <h1>{content.introTitle || 'Hablemos'}</h1>
+            <p>{content.introText || 'Dejanos tu mensaje y nos pondremos en contacto a la brevedad.'}</p>
+          </div>
+          <div className="page-hero-card">
+            <span>Yerba Buena</span>
+            <strong>Lola Mora y Brasil, Tucumán.</strong>
+          </div>
+        </div>
+      </header>
+
+      <section className="contact-page-section">
       <div className="split-container">
         {/* LADO IZQUIERDO: FORMULARIO */}
         <div className="split-left">
@@ -85,6 +106,7 @@ const Contacto = () => {
           </div>
         </div>
       </div>
+      </section>
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getNosotrosContent } from '../firebase';
+import pro1 from '../Assets/pro1.PNG';
 
 function Nosotros() {
   const [content, setContent] = useState({});
@@ -38,14 +39,28 @@ function Nosotros() {
     );
   }
 
+  const heroImage = content.heroImage || pro1;
+
   return (
     <div className="nosotros-page">
-      <header className="nosotros-hero">
+      <header
+        className="nosotros-hero page-hero-photo"
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+        }}
+      >
         <div className="nosotros-hero-content">
-          <h1>{content.title || 'Sobre la Fundación'}</h1>
-          <p>
-            {content.heroSubtitle || 'Construimos comunidad con compromiso, cercanía y trabajo compartido.'}
-          </p>
+          <div className="page-hero-copy">
+            <span className="page-eyebrow">Nosotros</span>
+            <h1>{content.title || 'Sobre la Fundación'}</h1>
+            <p>
+              {content.heroSubtitle || 'Construimos comunidad con compromiso, cercanía y trabajo compartido.'}
+            </p>
+          </div>
+          <div className="page-hero-card">
+            <span>Fundación Construir Juntos</span>
+            <strong>Cercanía, compromiso y trabajo territorial.</strong>
+          </div>
         </div>
       </header>
 

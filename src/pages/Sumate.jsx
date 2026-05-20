@@ -82,14 +82,28 @@ const Sumate = () => {
     );
   }
 
+  const heroImage = content.heroImage || visibleCarouselImages[0].src;
+
   return (
     <div className="sumate-page">
-      <header className="sumate-hero">
+      <header
+        className="sumate-hero page-hero-photo"
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+        }}
+      >
         <div className="sumate-hero-content">
-          <h1>{content.title || 'Sumate a la Fundación'}</h1>
-          <p>
-            {content.heroSubtitle || 'Tu tiempo, tu ayuda o tu aporte pueden transformar una realidad cercana.'}
-          </p>
+          <div className="page-hero-copy">
+            <span className="page-eyebrow">Sumate</span>
+            <h1>{content.title || 'Sumate a la Fundación'}</h1>
+            <p>
+              {content.heroSubtitle || 'Tu tiempo, tu ayuda o tu aporte pueden transformar una realidad cercana.'}
+            </p>
+          </div>
+          <div className="page-hero-card">
+            <span>Participación</span>
+            <strong>Voluntariado, donaciones y difusión para llegar más lejos.</strong>
+          </div>
         </div>
       </header>
 

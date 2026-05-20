@@ -51,6 +51,14 @@ const getStatusLabel = (status) => (
 const Cursos = () => {
   const [content, setContent] = useState({});
   const [loading, setLoading] = useState(true);
+  const [expandedCourses, setExpandedCourses] = useState({});
+
+  const toggleCourseExpand = (index) => {
+    setExpandedCourses((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
 
   useEffect(() => {
     const loadContent = async () => {
@@ -81,12 +89,24 @@ const Cursos = () => {
 
   return (
     <div className="cursos-page">
-      <header className="page-hero">
+      <header
+        className="page-hero page-hero-photo"
+        style={{
+          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${content.heroImage || courses[0]?.imagen || pro2}')`,
+        }}
+      >
         <div className="page-hero-content">
-          <h1>{content.title || 'Cursos y talleres'}</h1>
-          <p>
-            {content.heroSubtitle || 'Espacios de aprendizaje, encuentro y crecimiento para la comunidad.'}
-          </p>
+          <div className="page-hero-copy">
+            <span className="page-eyebrow">Cursos y talleres</span>
+            <h1>{content.title || 'Cursos y talleres'}</h1>
+            <p>
+              {content.heroSubtitle || 'Espacios de aprendizaje, encuentro y crecimiento para la comunidad.'}
+            </p>
+          </div>
+          <div className="page-hero-card">
+            <span>Aprender haciendo</span>
+            <strong>Encuentros prácticos para compartir saberes y abrir oportunidades.</strong>
+          </div>
         </div>
       </header>
 
@@ -107,7 +127,18 @@ const Cursos = () => {
                 <span className={getStatusClass(course.estado)}>{getStatusLabel(course.estado)}</span>
               )}
               <h2>{course.nombre}</h2>
-              <p>{course.descripcion}</p>
+              <p className={expandedCourses[index] ? 'feature-description expanded' : 'feature-description'}>
+                {course.descripcion}
+              </p>
+              {course.descripcion && (
+                <button
+                  type="button"
+                  className="btn-small feature-toggle"
+                  onClick={() => toggleCourseExpand(index)}
+                >
+                  {expandedCourses[index] ? 'Ver menos' : 'Ver más'}
+                </button>
+              )}
               <div className="course-meta">
                 {course.fecha && <span>{course.fecha}</span>}
                 {course.lugar && <span>{course.lugar}</span>}
