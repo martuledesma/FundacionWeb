@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Routes, Route } from 'react-router-dom';
+import { Link, Navigate, Routes, Route } from 'react-router-dom';
 import './index.css';
 import Navbar from './components/navbar';
 import Admin from './pages/Admin';
+import useHeroImageReady from './hooks/useHeroImageReady';
 
 // Importación de Páginas
 import Nosotros from './pages/Nosotros';
 import Sumate from './pages/Sumate';
-import Contacto from './pages/Contacto';
 import Proyectos from './pages/Proyectos';
 import Cursos from './pages/Cursos';
-
-// Importación de fotos
-import pro1 from './Assets/pro1.PNG';
-import pro2 from './Assets/pro2.PNG';
-import pro3 from './Assets/pro3.PNG';
-import pro4 from './Assets/pro4.PNG';
 
 import {
   onAuthStateChangedListener,
@@ -53,12 +47,6 @@ const defaultContent = {
   footerText: '© 2026 Fundación Construir Juntos - Yerba Buena, Tucumán',
 };
 
-const imageMap = {
-  1: pro1,
-  2: pro2,
-  3: pro3,
-};
-
 const parseLocalDate = (dateString) => {
   if (!dateString) return null;
   const [year, month, day] = dateString.split('-').map(Number);
@@ -76,6 +64,25 @@ const formatEventMonth = (dateString) => {
   return date ? date.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase() : '';
 };
 
+const WhatsAppIcon = () => (
+  <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+    <path d="M16.04 4C9.42 4 4.05 9.31 4.05 15.86c0 2.24.64 4.35 1.75 6.12L4 28l6.22-1.62A12.1 12.1 0 0 0 16.04 28C22.66 28 28 22.69 28 16.14 28 9.59 22.66 4 16.04 4Zm0 21.86c-1.82 0-3.58-.49-5.11-1.42l-.36-.21-3.69.96.98-3.56-.23-.37a9.68 9.68 0 0 1-1.48-5.12c0-5.38 4.42-9.76 9.89-9.76s9.89 4.38 9.89 9.76-4.42 9.72-9.89 9.72Zm5.42-7.28c-.3-.15-1.75-.85-2.02-.95-.27-.1-.47-.15-.67.15-.2.29-.77.95-.94 1.15-.17.2-.35.22-.65.07-.3-.15-1.25-.46-2.38-1.46-.88-.78-1.48-1.75-1.65-2.04-.17-.29-.02-.45.13-.6.14-.13.3-.34.45-.51.15-.17.2-.29.3-.49.1-.2.05-.37-.02-.51-.08-.15-.67-1.59-.92-2.17-.24-.56-.49-.49-.67-.5h-.57c-.2 0-.52.07-.79.37-.27.29-1.04 1-1.04 2.46 0 1.45 1.07 2.85 1.22 3.05.15.2 2.11 3.18 5.1 4.46.71.3 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.08 1.75-.71 2-1.39.25-.68.25-1.27.17-1.39-.07-.12-.27-.2-.57-.34Z" />
+  </svg>
+);
+
+const WhatsAppButton = ({ className = '', label = 'WhatsApp' }) => (
+  <button
+    type="button"
+    className={`whatsapp-button ${className}`.trim()}
+    aria-label={`${label} (próximamente)`}
+    aria-disabled="true"
+    title={`${label} (próximamente)`}
+  >
+    <WhatsAppIcon />
+    <span>{label}</span>
+  </button>
+);
+
 function App() {
   const [user, setUser] = useState(null);
   const [content, setContent] = useState(defaultContent);
@@ -92,6 +99,10 @@ function App() {
   useEffect(() => {
     const unsubscribe = subscribeSiteContent(
       (snapshot) => {
+        if (snapshot.metadata.fromCache && !snapshot.metadata.hasPendingWrites) {
+          return;
+        }
+
         if (snapshot.exists()) {
           setContent({ ...defaultContent, ...snapshot.data() });
         } else {
@@ -102,7 +113,8 @@ function App() {
       (error) => {
         console.error('Firebase content error:', error);
         setLoading(false);
-      }
+      },
+      { includeMetadataChanges: true }
     );
 
     return unsubscribe;
@@ -112,9 +124,10 @@ function App() {
   const eventosData = content.events || defaultContent.events;
   const novedadesSlides = acciones.map((item, index) => ({
     ...item,
-    imagen: item.imagen || imageMap[item.id] || [pro1, pro2, pro3, pro4][index] || pro4,
+    imagen: item.imagen || '',
   }));
-  const heroBackground = content.heroImage || novedadesSlides[0]?.imagen || pro1;
+  const heroBackground = content.heroImage || novedadesSlides.find((item) => item.imagen)?.imagen || '';
+  const heroReady = useHeroImageReady(heroBackground, loading);
 
   // Mostrar eventos de hoy en adelante
   const hoy = new Date();
@@ -153,6 +166,17 @@ function App() {
   const activeSlideIndex = novedadesSlides.length ? activeSlide % novedadesSlides.length : 0;
   const activeNovedad = novedadesSlides[activeSlideIndex];
 
+  if (!heroReady) {
+    return (
+      <div className="App">
+        <Navbar />
+        <div className="page-loader">
+          <span>Cargando contenido...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="App">
       <Navbar />
@@ -165,9 +189,9 @@ function App() {
             <>
               <header
                 className="home-hero"
-                style={{
+                style={heroBackground ? {
                   backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroBackground}')`,
-                }}
+                } : undefined}
               >
                 <div className="home-hero-content">
                   <span className="home-eyebrow">Yerba Buena, Tucumán</span>
@@ -194,7 +218,7 @@ function App() {
                     <span>Agenda</span>
                     <strong>{eventosProximos.length || eventosData.length}+ eventos</strong>
                   </div>
-                  <Link className="home-action-button" to="/contacto">Contactar</Link>
+                  <WhatsAppButton className="home-action-button" label="Contactar" />
                 </section>
 
                 <section className="home-stats" aria-label="Resumen de impacto">
@@ -229,11 +253,13 @@ function App() {
                   {novedadesSlides.length > 0 && (
                     <div className="home-carousel" aria-label="Carrusel de novedades">
                       <div className="home-carousel-frame">
-                        <img
-                          src={activeNovedad?.imagen}
-                          alt={activeNovedad?.titulo}
-                          className="home-carousel-image"
-                        />
+                        {activeNovedad?.imagen && (
+                          <img
+                            src={activeNovedad.imagen}
+                            alt={activeNovedad?.titulo}
+                            className="home-carousel-image"
+                          />
+                        )}
                         <div className="home-carousel-caption">
                           <span>Novedad destacada</span>
                           <h3>{activeNovedad?.titulo}</h3>
@@ -264,7 +290,7 @@ function App() {
                   <div className="home-services-grid">
                     {novedadesSlides.slice(0, 3).map((item, index) => (
                       <article className="home-service-card" key={item.id || index}>
-                        <img src={item.imagen} alt={item.titulo} />
+                        {item.imagen && <img src={item.imagen} alt={item.titulo} loading="lazy" decoding="async" />}
                         <div>
                           <span>{String(index + 1).padStart(2, '0')}</span>
                           <h3>{item.titulo}</h3>
@@ -293,7 +319,7 @@ function App() {
                   </div>
                   <div
                     className="home-dark-map"
-                    style={{ backgroundImage: `url('${heroBackground}')` }}
+                    style={heroBackground ? { backgroundImage: `url('${heroBackground}')` } : undefined}
                   >
                     <iframe
                       title="Mapa de ubicación Fundación Construir Juntos"
@@ -314,7 +340,7 @@ function App() {
                 <div className="home-events-panel">
                   <div className="home-section-heading home-section-heading-light">
                     <h2>Próximos eventos</h2>
-                    <Link className="home-more-link" to="/contacto">Consultar</Link>
+                    <WhatsAppButton className="home-more-link" label="Consultar" />
                   </div>
                   <div className="home-events-grid">
                     {(visibleEventos.length ? visibleEventos : eventosData.slice(0, 4)).map((ev) => (
@@ -341,9 +367,11 @@ function App() {
         <Route path="/proyectos" element={<Proyectos />} />
         <Route path="/cursos" element={<Cursos />} />
         <Route path="/sumate" element={<Sumate />} />
-        <Route path="/contacto" element={<Contacto />} />
+        <Route path="/contacto" element={<Navigate to="/" replace />} />
         <Route path="/admin" element={<Admin user={user} content={content} loading={loading} onSave={handleSaveContent} />} />
       </Routes>
+
+      <WhatsAppButton className="whatsapp-floating-button" />
 
       <footer className="footer">
         <p>{content.footerText || defaultContent.footerText}</p>

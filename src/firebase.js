@@ -32,7 +32,9 @@ export const logout = () => signOut(auth);
 export const onAuthStateChangedListener = (callback) => onAuthStateChanged(auth, callback);
 
 const siteContentRef = doc(db, 'siteContent', 'homepage');
-export const subscribeSiteContent = (callback, errorCallback) => onSnapshot(siteContentRef, callback, errorCallback);
+export const subscribeSiteContent = (callback, errorCallback, options = {}) => (
+  onSnapshot(siteContentRef, options, callback, errorCallback)
+);
 export const saveSiteContent = async (data) => setDoc(siteContentRef, data, { merge: true });
 
 const nosotrosContentRef = doc(db, 'siteContent', 'nosotros');
@@ -50,14 +52,6 @@ export const getSumateContent = async () => {
   return snapshot.exists() ? snapshot.data() : null;
 };
 export const saveSumateContent = async (data) => setDoc(sumateContentRef, data, { merge: true });
-
-const contactoContentRef = doc(db, 'siteContent', 'contacto');
-export const subscribeContactoContent = (callback, errorCallback) => onSnapshot(contactoContentRef, callback, errorCallback);
-export const getContactoContent = async () => {
-  const snapshot = await getDoc(contactoContentRef);
-  return snapshot.exists() ? snapshot.data() : null;
-};
-export const saveContactoContent = async (data) => setDoc(contactoContentRef, data, { merge: true });
 
 const proyectosContentRef = doc(db, 'siteContent', 'proyectos');
 export const subscribeProyectosContent = (callback, errorCallback) => onSnapshot(proyectosContentRef, callback, errorCallback);

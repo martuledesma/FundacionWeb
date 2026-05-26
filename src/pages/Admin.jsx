@@ -10,8 +10,6 @@ import {
   saveNosotrosContent,
   subscribeSumateContent,
   saveSumateContent,
-  subscribeContactoContent,
-  saveContactoContent,
   subscribeProyectosContent,
   saveProyectosContent,
   subscribeCursosContent,
@@ -31,7 +29,6 @@ const Admin = ({ user, content, loading, onSave }) => {
 
   const [nosotrosContent, setNosotrosContent] = useState({});
   const [sumateContent, setSumateContent] = useState({});
-  const [contactoContent, setContactoContent] = useState({});
   const [proyectosContent, setProyectosContent] = useState({});
   const [cursosContent, setCursosContent] = useState({});
 
@@ -56,15 +53,6 @@ const Admin = ({ user, content, loading, onSave }) => {
       (error) => console.error('Sumate content error:', error)
     );
 
-    const unsubscribeContacto = subscribeContactoContent(
-      (snapshot) => {
-        if (snapshot.exists()) {
-          setContactoContent(snapshot.data());
-        }
-      },
-      (error) => console.error('Contacto content error:', error)
-    );
-
     const unsubscribeProyectos = subscribeProyectosContent(
       (snapshot) => {
         setProyectosContent(snapshot.exists() ? snapshot.data() : { items: [] });
@@ -82,7 +70,6 @@ const Admin = ({ user, content, loading, onSave }) => {
     return () => {
       unsubscribeNosotros();
       unsubscribeSumate();
-      unsubscribeContacto();
       unsubscribeProyectos();
       unsubscribeCursos();
     };
@@ -117,8 +104,6 @@ const Admin = ({ user, content, loading, onSave }) => {
       setNosotrosContent((prev) => ({ ...prev, [field]: value }));
     } else if (page === 'sumate') {
       setSumateContent((prev) => ({ ...prev, [field]: value }));
-    } else if (page === 'contacto') {
-      setContactoContent((prev) => ({ ...prev, [field]: value }));
     } else if (page === 'proyectos') {
       setProyectosContent((prev) => ({ ...prev, [field]: value }));
     } else if (page === 'cursos') {
@@ -366,8 +351,6 @@ const Admin = ({ user, content, loading, onSave }) => {
         await saveNosotrosContent(nosotrosContent);
       } else if (activeTab === 'sumate') {
         await saveSumateContent(sumateContent);
-      } else if (activeTab === 'contacto') {
-        await saveContactoContent(contactoContent);
       } else if (activeTab === 'proyectos') {
         await saveProyectosContent(proyectosContent);
       } else if (activeTab === 'cursos') {
@@ -1002,62 +985,6 @@ const Admin = ({ user, content, loading, onSave }) => {
           </>
         );
 
-      case 'contacto':
-        return (
-          <div className="editor-block">
-            <h3>Contenido de la página "Contacto"</h3>
-            {renderHeroImageField(contactoContent, 'contacto')}
-            <label>
-              Título de introducción
-              <input
-                type="text"
-                value={contactoContent?.introTitle || ''}
-                onChange={(e) => updateField('introTitle', e.target.value, 'contacto')}
-              />
-            </label>
-            <label>
-              Texto de introducción
-              <textarea
-                rows="3"
-                value={contactoContent?.introText || ''}
-                onChange={(e) => updateField('introText', e.target.value, 'contacto')}
-              />
-            </label>
-            <label>
-              Nombre completo (etiqueta)
-              <input
-                type="text"
-                value={contactoContent?.nameLabel || ''}
-                onChange={(e) => updateField('nameLabel', e.target.value, 'contacto')}
-              />
-            </label>
-            <label>
-              Email (etiqueta)
-              <input
-                type="text"
-                value={contactoContent?.emailLabel || ''}
-                onChange={(e) => updateField('emailLabel', e.target.value, 'contacto')}
-              />
-            </label>
-            <label>
-              Mensaje (etiqueta)
-              <input
-                type="text"
-                value={contactoContent?.messageLabel || ''}
-                onChange={(e) => updateField('messageLabel', e.target.value, 'contacto')}
-              />
-            </label>
-            <label>
-              Texto del botón
-              <input
-                type="text"
-                value={contactoContent?.buttonText || ''}
-                onChange={(e) => updateField('buttonText', e.target.value, 'contacto')}
-              />
-            </label>
-          </div>
-        );
-
       default:
         return null;
     }
@@ -1105,12 +1032,6 @@ const Admin = ({ user, content, loading, onSave }) => {
           onClick={() => setActiveTab('cursos')}
         >
           Cursos
-        </button>
-        <button
-          className={`tab-button ${activeTab === 'contacto' ? 'active' : ''}`}
-          onClick={() => setActiveTab('contacto')}
-        >
-          Contacto
         </button>
       </div>
 
