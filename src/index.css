@@ -1784,6 +1784,9 @@ footer {
     }
 
     .nav-links .btn-nav {
+        color: var(--texto-oscuro) !important;
+        background: rgba(0, 86, 179, 0.05);
+        box-shadow: none;
         justify-content: center;
         margin-top: 4px;
     }
