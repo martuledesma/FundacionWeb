@@ -1,5 +1,5 @@
-const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'dwkdishyg';
+const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'fundación-web';
 
 export const isCloudinaryConfigured = Boolean(cloudName && uploadPreset);
 
