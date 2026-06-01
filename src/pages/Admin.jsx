@@ -140,6 +140,14 @@ const Admin = ({ user, content, loading, onSave }) => {
     }));
   };
 
+  const updateNosotrosClosingValue = (index, value) => {
+    setNosotrosContent((prev) => {
+      const closingValues = [...(prev.closingValues || ['Servicio', 'Trabajo', 'Impacto'])];
+      closingValues[index] = value;
+      return { ...prev, closingValues };
+    });
+  };
+
   const updateSumateCarouselImage = (index, field, value) => {
     setSumateContent((prev) => ({
       ...prev,
@@ -165,6 +173,20 @@ const Admin = ({ user, content, loading, onSave }) => {
         idx === index ? { ...item, [field]: value } : item
       ),
     }));
+  };
+
+  const getCursosGalleryImages = (content = cursosContent) => (
+    Array.from({ length: 3 }, (_, index) => (
+      content.galleryImages?.[index] || { id: `gallery-${index + 1}`, url: '', alt: '' }
+    ))
+  );
+
+  const updateCursosGalleryImage = (index, field, value) => {
+    setCursosContent((prev) => {
+      const galleryImages = getCursosGalleryImages(prev);
+      galleryImages[index] = { ...galleryImages[index], [field]: value };
+      return { ...prev, galleryImages };
+    });
   };
 
   const getItemKey = (section, item, index) => `${section}-${item?.id || index}`;
@@ -667,6 +689,56 @@ const Admin = ({ user, content, loading, onSave }) => {
                 ),
               }))}
             </div>
+
+            <div className="editor-block">
+              <h3>Cierre institucional</h3>
+              <label>
+                Título
+                <input
+                  type="text"
+                  value={nosotrosContent?.closingTitle || ''}
+                  onChange={(e) => updateField('closingTitle', e.target.value, 'nosotros')}
+                  placeholder="Construimos comunidad con acciones concretas"
+                />
+              </label>
+              <label>
+                Texto
+                <textarea
+                  rows="4"
+                  value={nosotrosContent?.closingText || ''}
+                  onChange={(e) => updateField('closingText', e.target.value, 'nosotros')}
+                  placeholder="Conocé nuestros proyectos o sumate para acompañar el trabajo de la fundación."
+                />
+              </label>
+              {(nosotrosContent?.closingValues || ['Servicio', 'Trabajo', 'Impacto']).map((value, index) => (
+                <label key={`closing-value-${index}`}>
+                  Valor {index + 1}
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => updateNosotrosClosingValue(index, e.target.value)}
+                  />
+                </label>
+              ))}
+              <label>
+                Texto del botón Proyectos
+                <input
+                  type="text"
+                  value={nosotrosContent?.closingProjectsLabel || ''}
+                  onChange={(e) => updateField('closingProjectsLabel', e.target.value, 'nosotros')}
+                  placeholder="Conocé nuestros proyectos"
+                />
+              </label>
+              <label>
+                Texto del botón Sumate
+                <input
+                  type="text"
+                  value={nosotrosContent?.closingJoinLabel || ''}
+                  onChange={(e) => updateField('closingJoinLabel', e.target.value, 'nosotros')}
+                  placeholder="Sumate"
+                />
+              </label>
+            </div>
           </>
         );
 
@@ -840,6 +912,14 @@ const Admin = ({ user, content, loading, onSave }) => {
             <div className="editor-block">
               <h3>Contenido de la página "Cursos y Talleres"</h3>
               <label>
+                Texto pequeño de portada
+                <input
+                  type="text"
+                  value={cursosContent?.heroEyebrow || ''}
+                  onChange={(e) => updateField('heroEyebrow', e.target.value, 'cursos')}
+                />
+              </label>
+              <label>
                 Título principal
                 <input
                   type="text"
@@ -849,7 +929,7 @@ const Admin = ({ user, content, loading, onSave }) => {
               </label>
               {renderHeroImageField(cursosContent, 'cursos')}
               <label>
-                Subtítulo del bloque azul
+                Subtítulo de portada
                 <input
                   type="text"
                   value={cursosContent?.heroSubtitle || ''}
@@ -857,17 +937,49 @@ const Admin = ({ user, content, loading, onSave }) => {
                 />
               </label>
               <label>
-                Texto introductorio
+                Texto pequeño de la tarjeta de portada
+                <input
+                  type="text"
+                  value={cursosContent?.heroCardEyebrow || ''}
+                  onChange={(e) => updateField('heroCardEyebrow', e.target.value, 'cursos')}
+                />
+              </label>
+              <label>
+                Texto principal de la tarjeta de portada
                 <textarea
-                  rows="4"
-                  value={cursosContent?.introText || ''}
-                  onChange={(e) => updateField('introText', e.target.value, 'cursos')}
+                  rows="3"
+                  value={cursosContent?.heroCardText || ''}
+                  onChange={(e) => updateField('heroCardText', e.target.value, 'cursos')}
                 />
               </label>
             </div>
 
             <div className="editor-block">
               <h3>Listado de cursos y talleres</h3>
+              <label>
+                Texto pequeño sobre el carrusel
+                <input
+                  type="text"
+                  value={cursosContent?.carouselEyebrow || ''}
+                  onChange={(e) => updateField('carouselEyebrow', e.target.value, 'cursos')}
+                />
+              </label>
+              <label>
+                Título del carrusel
+                <input
+                  type="text"
+                  value={cursosContent?.carouselTitle || ''}
+                  onChange={(e) => updateField('carouselTitle', e.target.value, 'cursos')}
+                />
+              </label>
+              <label>
+                Texto del botón de inscripción
+                <input
+                  type="text"
+                  value={cursosContent?.enrollmentLabel || ''}
+                  onChange={(e) => updateField('enrollmentLabel', e.target.value, 'cursos')}
+                />
+              </label>
               <button className="btn-nav" onClick={addNewCurso}>
                 Agregar
               </button>
@@ -944,6 +1056,51 @@ const Admin = ({ user, content, loading, onSave }) => {
                   </>
                 ),
               }))}
+            </div>
+
+            <div className="editor-block">
+              <h3>Carrusel de fotos</h3>
+              <p className="admin-note">Podés cargar hasta tres imágenes para mostrar debajo de los cursos.</p>
+              <label>
+                Texto pequeño sobre las fotos
+                <input
+                  type="text"
+                  value={cursosContent?.galleryEyebrow || ''}
+                  onChange={(e) => updateField('galleryEyebrow', e.target.value, 'cursos')}
+                />
+              </label>
+              <label>
+                Título del carrusel de fotos
+                <input
+                  type="text"
+                  value={cursosContent?.galleryTitle || ''}
+                  onChange={(e) => updateField('galleryTitle', e.target.value, 'cursos')}
+                />
+              </label>
+              {getCursosGalleryImages().map((image, index) => (
+                <div className="editor-card is-open" key={image.id || index}>
+                  <div className="editor-item-header">
+                    <div className="editor-item-title">
+                      <h4>Imagen {index + 1}</h4>
+                    </div>
+                  </div>
+                  <div className="editor-item-body">
+                    <ImageUploadField
+                      value={image.url || ''}
+                      onChange={(value) => updateCursosGalleryImage(index, 'url', value)}
+                      previewAlt={`Preview galería ${index + 1}`}
+                    />
+                    <label>
+                      Descripción accesible de la imagen
+                      <input
+                        type="text"
+                        value={image.alt || ''}
+                        onChange={(e) => updateCursosGalleryImage(index, 'alt', e.target.value)}
+                      />
+                    </label>
+                  </div>
+                </div>
+              ))}
             </div>
           </>
         );

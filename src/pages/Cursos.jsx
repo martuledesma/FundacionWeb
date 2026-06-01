@@ -1,15 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { getCursosContent } from '../firebase';
-import pro2 from '../Assets/pro2.PNG';
-import pro3 from '../Assets/pro3.PNG';
-import pro4 from '../Assets/pro4.PNG';
+import useHeroImageReady from '../hooks/useHeroImageReady';
 
 const defaultCourses = [
   {
     id: 1,
     nombre: 'Taller de reciclado',
     descripcion: 'Encuentros prácticos para aprender a reutilizar materiales y cuidar el ambiente desde casa.',
-    imagen: pro2,
+    imagen: '',
     fecha: 'Sábados',
     lugar: 'Sede de la fundación',
     estado: 'Activo',
@@ -19,7 +17,7 @@ const defaultCourses = [
     id: 2,
     nombre: 'Apoyo escolar',
     descripcion: 'Acompañamiento educativo para niños, niñas y adolescentes de la comunidad.',
-    imagen: pro3,
+    imagen: '',
     fecha: 'Durante la semana',
     lugar: 'Yerba Buena',
     estado: 'Activo',
@@ -29,7 +27,7 @@ const defaultCourses = [
     id: 3,
     nombre: 'Huerta y alimentación saludable',
     descripcion: 'Talleres para aprender técnicas básicas de huerta y promover hábitos saludables.',
-    imagen: pro4,
+    imagen: '',
     fecha: 'Próximamente',
     lugar: 'A confirmar',
     estado: 'Próximamente',
@@ -50,14 +48,36 @@ const getStatusLabel = (status) => (
 
 const Cursos = () => {
   const [content, setContent] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [expandedCourses, setExpandedCourses] = useState({});
+  const coursesTrackRef = useRef(null);
+  const galleryTrackRef = useRef(null);
 
   const toggleCourseExpand = (index) => {
     setExpandedCourses((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
+  };
+
+  const scrollCourses = (direction) => {
+    const track = coursesTrackRef.current;
+    if (!track) return;
+
+    track.scrollBy({
+      left: direction * Math.min(track.clientWidth * 0.78, 720),
+      behavior: 'smooth',
+    });
+  };
+
+  const scrollGallery = (direction) => {
+    const track = galleryTrackRef.current;
+    if (!track) return;
+
+    track.scrollBy({
+      left: direction * Math.min(track.clientWidth * 0.82, 760),
+      behavior: 'smooth',
+    });
   };
 
   useEffect(() => {
@@ -70,7 +90,7 @@ const Cursos = () => {
       } catch (error) {
         console.error('Error loading cursos content:', error);
       } finally {
-        setLoading(false);
+        setContentLoaded(true);
       }
     };
 
@@ -78,11 +98,24 @@ const Cursos = () => {
   }, []);
 
   const courses = content.items?.length ? content.items : defaultCourses;
+  const configuredGalleryImages = (content.galleryImages || [])
+    .filter((image) => image?.url)
+    .slice(0, 3);
+  const fallbackGalleryImages = courses
+    .filter((course) => course.imagen)
+    .slice(0, 3)
+    .map((course) => ({
+      url: course.imagen,
+      alt: course.nombre,
+    }));
+  const galleryImages = configuredGalleryImages.length ? configuredGalleryImages : fallbackGalleryImages;
+  const heroImage = content.heroImage || courses.find((course) => course.imagen)?.imagen || '';
+  const heroReady = useHeroImageReady(heroImage, !contentLoaded);
 
-  if (loading) {
+  if (!heroReady) {
     return (
-      <div className="section">
-        <p>Cargando contenido...</p>
+      <div className="page-loader">
+        <span>Cargando contenido...</span>
       </div>
     );
   }
@@ -91,67 +124,118 @@ const Cursos = () => {
     <div className="cursos-page">
       <header
         className="page-hero page-hero-photo"
-        style={{
-          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${content.heroImage || courses[0]?.imagen || pro2}')`,
-        }}
+        style={heroImage ? {
+          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+        } : undefined}
       >
         <div className="page-hero-content">
           <div className="page-hero-copy">
-            <span className="page-eyebrow">Cursos y talleres</span>
+            <span className="page-eyebrow">{content.heroEyebrow || 'Cursos y talleres'}</span>
             <h1>{content.title || 'Cursos y talleres'}</h1>
             <p>
               {content.heroSubtitle || 'Espacios de aprendizaje, encuentro y crecimiento para la comunidad.'}
             </p>
           </div>
           <div className="page-hero-card">
-            <span>Aprender haciendo</span>
-            <strong>Encuentros prácticos para compartir saberes y abrir oportunidades.</strong>
+            <span>{content.heroCardEyebrow || 'Aprender haciendo'}</span>
+            <strong>{content.heroCardText || 'Encuentros prácticos para compartir saberes y abrir oportunidades.'}</strong>
           </div>
         </div>
       </header>
 
-      <section className="page-intro">
-        <p>
-          {content.introText || 'Estos espacios están pensados para aprender haciendo, compartir saberes y abrir nuevas oportunidades de participación.'}
-        </p>
+      <section className="courses-carousel-section" aria-label="Listado de cursos y talleres">
+        <div className="courses-carousel-header">
+          <div>
+            <span>{content.carouselEyebrow || 'Aprender haciendo'}</span>
+            <h2>{content.carouselTitle || 'Explorá nuestros cursos y talleres'}</h2>
+          </div>
+          <div className="courses-carousel-controls">
+            <button type="button" onClick={() => scrollCourses(-1)} aria-label="Ver cursos anteriores">
+              ←
+            </button>
+            <button type="button" onClick={() => scrollCourses(1)} aria-label="Ver cursos siguientes">
+              →
+            </button>
+          </div>
+        </div>
+
+        <div className="courses-carousel-track" ref={coursesTrackRef}>
+          {courses.map((course, index) => (
+            <article
+              className={`course-carousel-card ${expandedCourses[index] ? 'is-expanded' : ''}`}
+              key={course.id || index}
+              tabIndex="0"
+              onClick={() => toggleCourseExpand(index)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  toggleCourseExpand(index);
+                }
+              }}
+            >
+              {course.imagen && (
+                <img src={course.imagen} alt={course.nombre} loading="lazy" decoding="async" />
+              )}
+              <div className="course-carousel-overlay">
+                {course.estado && (
+                  <span className={getStatusClass(course.estado)}>{getStatusLabel(course.estado)}</span>
+                )}
+                <h2>{course.nombre}</h2>
+                <div className="course-carousel-details">
+                  <p>{course.descripcion}</p>
+                  <div className="course-meta">
+                    {course.fecha && <span>{course.fecha}</span>}
+                    {course.lugar && <span>{course.lugar}</span>}
+                  </div>
+                  {course.link && (
+                    <a
+                      className="course-carousel-link"
+                      href={course.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      {content.enrollmentLabel || 'Inscribirme'}
+                    </a>
+                  )}
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
-      <section className="feature-grid courses-grid" aria-label="Listado de cursos y talleres">
-        {courses.map((course, index) => (
-          <article className="feature-card course-card" key={course.id || index}>
-            {course.imagen && (
-              <img src={course.imagen} alt={course.nombre} className="feature-card-img" />
-            )}
-            <div className="feature-card-content">
-              {course.estado && (
-                <span className={getStatusClass(course.estado)}>{getStatusLabel(course.estado)}</span>
-              )}
-              <h2>{course.nombre}</h2>
-              <p className={expandedCourses[index] ? 'feature-description expanded' : 'feature-description'}>
-                {course.descripcion}
-              </p>
-              {course.descripcion && (
-                <button
-                  type="button"
-                  className="btn-small feature-toggle"
-                  onClick={() => toggleCourseExpand(index)}
-                >
-                  {expandedCourses[index] ? 'Ver menos' : 'Ver más'}
-                </button>
-              )}
-              <div className="course-meta">
-                {course.fecha && <span>{course.fecha}</span>}
-                {course.lugar && <span>{course.lugar}</span>}
-              </div>
-              {course.link && (
-                <a className="btn-small course-link" href={course.link} target="_blank" rel="noreferrer">
-                  Inscribirme
-                </a>
-              )}
+      {galleryImages.length > 0 && (
+        <section className="courses-gallery-section" aria-label="Galería de cursos y talleres">
+          <div className="courses-gallery-header">
+            <div>
+              <span>{content.galleryEyebrow || 'Momentos compartidos'}</span>
+              <h2>{content.galleryTitle || 'Aprender también es encontrarnos'}</h2>
             </div>
-          </article>
-        ))}
-      </section>
+            <div className="courses-carousel-controls">
+              <button type="button" onClick={() => scrollGallery(-1)} aria-label="Ver fotos anteriores">
+                ←
+              </button>
+              <button type="button" onClick={() => scrollGallery(1)} aria-label="Ver fotos siguientes">
+                →
+              </button>
+            </div>
+          </div>
+
+          <div className="courses-gallery-track" ref={galleryTrackRef}>
+            {galleryImages.map((image, index) => (
+              <figure className="courses-gallery-card" key={image.id || `${image.url}-${index}`}>
+                <img
+                  src={image.url}
+                  alt={image.alt || `Foto ${index + 1} de cursos y talleres`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

@@ -1,17 +1,31 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getNosotrosContent } from '../firebase';
-import pro1 from '../Assets/pro1.PNG';
+import useHeroImageReady from '../hooks/useHeroImageReady';
+
+const defaultClosingValues = ['Servicio', 'Trabajo', 'Impacto'];
 
 function Nosotros() {
   const [content, setContent] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [expandedMembers, setExpandedMembers] = useState({});
+  const teamTrackRef = useRef(null);
 
   const toggleMemberExpand = (index) => {
     setExpandedMembers((prev) => ({
       ...prev,
       [index]: !prev[index],
     }));
+  };
+
+  const scrollTeam = (direction) => {
+    const track = teamTrackRef.current;
+    if (!track) return;
+
+    track.scrollBy({
+      left: direction * Math.min(track.clientWidth * 0.78, 720),
+      behavior: 'smooth',
+    });
   };
 
   useEffect(() => {
@@ -24,30 +38,35 @@ function Nosotros() {
       } catch (error) {
         console.error('Error loading nosotros content:', error);
       } finally {
-        setLoading(false);
+        setContentLoaded(true);
       }
     };
 
     loadContent();
   }, []);
 
-  if (loading) {
+  const heroImage = content.heroImage || '';
+  const heroReady = useHeroImageReady(heroImage, !contentLoaded);
+  const closingValues = Array.from(
+    { length: 3 },
+    (_, index) => content.closingValues?.[index] || defaultClosingValues[index]
+  );
+
+  if (!heroReady) {
     return (
-      <div className="section">
-        <p>Cargando contenido...</p>
+      <div className="page-loader">
+        <span>Cargando contenido...</span>
       </div>
     );
   }
-
-  const heroImage = content.heroImage || pro1;
 
   return (
     <div className="nosotros-page">
       <header
         className="nosotros-hero page-hero-photo"
-        style={{
+        style={heroImage ? {
           backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
-        }}
+        } : undefined}
       >
         <div className="nosotros-hero-content">
           <div className="page-hero-copy">
@@ -64,50 +83,85 @@ function Nosotros() {
         </div>
       </header>
 
-      <section className="nosotros-content">
-        <div className="nosotros-text">
-          <p>
-            {content.content || 'Somos un grupo de vecinos de Yerba Buena trabajando por el bien común...'}
-          </p>
-          {content.additionalText && (
+      {/* Sección del equipo */}
+      <section className="team-section team-carousel-section">
+        <div className="team-carousel-header">
+          <div>
+            <span>Nosotros</span>
+            <h2>Las personas detrás de cada proyecto</h2>
+          </div>
+          <div className="team-carousel-controls">
+            <button type="button" onClick={() => scrollTeam(-1)} aria-label="Ver integrantes anteriores">
+              ←
+            </button>
+            <button type="button" onClick={() => scrollTeam(1)} aria-label="Ver integrantes siguientes">
+              →
+            </button>
+          </div>
+        </div>
+
+        <div className="team-carousel-track" ref={teamTrackRef}>
+          <article className="team-carousel-intro">
+            <span>Sobre nosotros</span>
             <p>
-              {content.additionalText}
+              {content.content || 'Somos un grupo de vecinos de Yerba Buena trabajando por el bien común...'}
             </p>
-          )}
+            {content.additionalText && <p>{content.additionalText}</p>}
+          </article>
+
+          {(content.teamCards || []).map((member, index) => (
+            <article
+              className={`team-card team-carousel-card ${expandedMembers[index] ? 'is-expanded' : ''}`}
+              key={member.id || index}
+              tabIndex="0"
+              onClick={() => toggleMemberExpand(index)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  toggleMemberExpand(index);
+                }
+              }}
+            >
+              {member.imagen && (
+                <div className="team-image">
+                  <img src={member.imagen} alt={member.nombre} loading="lazy" decoding="async" />
+                </div>
+              )}
+              <div className="team-card-overlay">
+                <h3>{member.nombre}</h3>
+                <p>{member.descripcion}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
-      {/* Sección del equipo */}
-      {content.teamCards && content.teamCards.length > 0 && (
-        <div className="team-section">
-          <div className="team-grid">
-            {content.teamCards.map((member, index) => (
-              <div className="team-card" key={member.id || index}>
-                {member.imagen && (
-                  <div className="team-image">
-                    <img src={member.imagen} alt={member.nombre} />
-                  </div>
-                )}
-                <div className="team-info">
-                  <h3>{member.nombre}</h3>
-                  <p className={expandedMembers[index] ? 'team-description expanded' : 'team-description'}>
-                    {member.descripcion}
-                  </p>
-                  {member.descripcion && member.descripcion.length > 140 && (
-                    <button
-                      type="button"
-                      className="btn-small team-toggle"
-                      onClick={() => toggleMemberExpand(index)}
-                    >
-                      {expandedMembers[index] ? 'Ver menos' : 'Ver más'}
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
+      <section className="nosotros-closing" aria-label="Cómo trabajamos">
+        <div className="nosotros-closing-values">
+          {closingValues.map((value, index) => (
+            <div key={`${value}-${index}`}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{value}</strong>
+            </div>
+          ))}
+        </div>
+        <div className="nosotros-closing-cta">
+          <div>
+            <h2>{content.closingTitle || 'Construimos comunidad con acciones concretas'}</h2>
+            <p>
+              {content.closingText || 'Conocé nuestros proyectos o sumate para acompañar el trabajo de la fundación.'}
+            </p>
+          </div>
+          <div className="nosotros-closing-actions">
+            <Link to="/proyectos">
+              {content.closingProjectsLabel || 'Conocé nuestros proyectos'}
+            </Link>
+            <Link to="/sumate">
+              {content.closingJoinLabel || 'Sumate'}
+            </Link>
           </div>
         </div>
-      )}
+      </section>
     </div>
   );
 }

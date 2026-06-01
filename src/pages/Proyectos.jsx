@@ -1,29 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { getProyectosContent } from '../firebase';
-import pro1 from '../Assets/pro1.PNG';
-import pro2 from '../Assets/pro2.PNG';
-import pro3 from '../Assets/pro3.PNG';
+import useHeroImageReady from '../hooks/useHeroImageReady';
 
 const defaultProjects = [
   {
     id: 1,
     titulo: 'Acompañamiento escolar',
     descripcion: 'Espacios de apoyo para fortalecer trayectorias educativas y acompañar a familias de la comunidad.',
-    imagen: pro1,
+    imagen: '',
     estado: 'Activo',
   },
   {
     id: 2,
     titulo: 'Campañas solidarias',
     descripcion: 'Colectas de alimentos, ropa y útiles para responder a necesidades concretas del territorio.',
-    imagen: pro2,
+    imagen: '',
     estado: 'Activo',
   },
   {
     id: 3,
     titulo: 'Huerta comunitaria',
     descripcion: 'Un proyecto de aprendizaje, producción y encuentro para promover hábitos saludables.',
-    imagen: pro3,
+    imagen: '',
     estado: 'Próximamente',
   },
 ];
@@ -41,7 +39,7 @@ const getStatusLabel = (status) => (
 
 const Proyectos = () => {
   const [content, setContent] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [expandedProjects, setExpandedProjects] = useState({});
 
   const toggleProjectExpand = (index) => {
@@ -61,7 +59,7 @@ const Proyectos = () => {
       } catch (error) {
         console.error('Error loading proyectos content:', error);
       } finally {
-        setLoading(false);
+        setContentLoaded(true);
       }
     };
 
@@ -69,11 +67,13 @@ const Proyectos = () => {
   }, []);
 
   const projects = content.items?.length ? content.items : defaultProjects;
+  const heroImage = content.heroImage || projects.find((project) => project.imagen)?.imagen || '';
+  const heroReady = useHeroImageReady(heroImage, !contentLoaded);
 
-  if (loading) {
+  if (!heroReady) {
     return (
-      <div className="section">
-        <p>Cargando contenido...</p>
+      <div className="page-loader">
+        <span>Cargando contenido...</span>
       </div>
     );
   }
@@ -82,9 +82,9 @@ const Proyectos = () => {
     <div className="proyectos-page">
       <header
         className="page-hero page-hero-photo"
-        style={{
-          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${content.heroImage || projects[0]?.imagen || pro1}')`,
-        }}
+        style={heroImage ? {
+          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+        } : undefined}
       >
         <div className="page-hero-content">
           <div className="page-hero-copy">
@@ -111,7 +111,7 @@ const Proyectos = () => {
         {projects.map((project, index) => (
           <article className="feature-card" key={project.id || index}>
             {project.imagen && (
-              <img src={project.imagen} alt={project.titulo} className="feature-card-img" />
+              <img src={project.imagen} alt={project.titulo} className="feature-card-img" loading="lazy" decoding="async" />
             )}
             <div className="feature-card-content">
               {project.estado && (

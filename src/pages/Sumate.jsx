@@ -1,20 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getSumateContent } from '../firebase';
-import pro1 from '../Assets/pro1.PNG';
-import pro2 from '../Assets/pro2.PNG';
-import pro3 from '../Assets/pro3.PNG';
-import pro4 from '../Assets/pro4.PNG';
-
-const carouselImages = [
-  { src: pro1, alt: 'Actividad comunitaria de la fundación' },
-  { src: pro2, alt: 'Campaña solidaria de la fundación' },
-  { src: pro3, alt: 'Voluntariado y acompañamiento comunitario' },
-  { src: pro4, alt: 'Acción territorial de la fundación' },
-];
+import useHeroImageReady from '../hooks/useHeroImageReady';
 
 const Sumate = () => {
   const [content, setContent] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [contentLoaded, setContentLoaded] = useState(false);
   const [activeSlide, setActiveSlide] = useState(0);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const editableCarouselImages = (content.carouselImages || [])
@@ -23,13 +13,15 @@ const Sumate = () => {
       src: image.url,
       alt: image.alt || `Foto ${index + 1} de la fundación`,
     }));
-  const visibleCarouselImages = editableCarouselImages.length > 0 ? editableCarouselImages : carouselImages;
+  const visibleCarouselImages = editableCarouselImages;
 
   const goToPreviousSlide = () => {
+    if (!visibleCarouselImages.length) return;
     setActiveSlide((prev) => (prev === 0 ? visibleCarouselImages.length - 1 : prev - 1));
   };
 
   const goToNextSlide = () => {
+    if (!visibleCarouselImages.length) return;
     setActiveSlide((prev) => (prev === visibleCarouselImages.length - 1 ? 0 : prev + 1));
   };
 
@@ -43,7 +35,7 @@ const Sumate = () => {
       } catch (error) {
         console.error('Error loading sumate content:', error);
       } finally {
-        setLoading(false);
+        setContentLoaded(true);
       }
     };
 
@@ -74,23 +66,24 @@ const Sumate = () => {
     };
   }, [isFormOpen]);
 
-  if (loading) {
+  const heroImage = content.heroImage || visibleCarouselImages[0]?.src || '';
+  const heroReady = useHeroImageReady(heroImage, !contentLoaded);
+
+  if (!heroReady) {
     return (
-      <div className="section">
-        <p>Cargando contenido...</p>
+      <div className="page-loader">
+        <span>Cargando contenido...</span>
       </div>
     );
   }
-
-  const heroImage = content.heroImage || visibleCarouselImages[0].src;
 
   return (
     <div className="sumate-page">
       <header
         className="sumate-hero page-hero-photo"
-        style={{
+        style={heroImage ? {
           backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
-        }}
+        } : undefined}
       >
         <div className="sumate-hero-content">
           <div className="page-hero-copy">
@@ -139,40 +132,44 @@ const Sumate = () => {
       </section>
 
       <section className="sumate-gallery" aria-label="Fotos de la fundación">
-        <div className="sumate-carousel">
-          <button
-            type="button"
-            className="carousel-control carousel-control-prev"
-            onClick={goToPreviousSlide}
-            aria-label="Ver imagen anterior"
-          >
-            ‹
-          </button>
-          <img
-            src={visibleCarouselImages[activeSlide].src}
-            alt={visibleCarouselImages[activeSlide].alt}
-            className="sumate-carousel-image"
-          />
-          <button
-            type="button"
-            className="carousel-control carousel-control-next"
-            onClick={goToNextSlide}
-            aria-label="Ver imagen siguiente"
-          >
-            ›
-          </button>
-          <div className="carousel-dots" aria-label="Seleccionar imagen">
-            {visibleCarouselImages.map((image, index) => (
-              <button
-                key={`${image.src}-${index}`}
-                type="button"
-                className={index === activeSlide ? 'carousel-dot active' : 'carousel-dot'}
-                onClick={() => setActiveSlide(index)}
-                aria-label={`Ver imagen ${index + 1}`}
-              />
-            ))}
+        {visibleCarouselImages.length > 0 && (
+          <div className="sumate-carousel">
+            <button
+              type="button"
+              className="carousel-control carousel-control-prev"
+              onClick={goToPreviousSlide}
+              aria-label="Ver imagen anterior"
+            >
+              ‹
+            </button>
+            <img
+              src={visibleCarouselImages[activeSlide].src}
+              alt={visibleCarouselImages[activeSlide].alt}
+              className="sumate-carousel-image"
+              loading="lazy"
+              decoding="async"
+            />
+            <button
+              type="button"
+              className="carousel-control carousel-control-next"
+              onClick={goToNextSlide}
+              aria-label="Ver imagen siguiente"
+            >
+              ›
+            </button>
+            <div className="carousel-dots" aria-label="Seleccionar imagen">
+              {visibleCarouselImages.map((image, index) => (
+                <button
+                  key={`${image.src}-${index}`}
+                  type="button"
+                  className={index === activeSlide ? 'carousel-dot active' : 'carousel-dot'}
+                  onClick={() => setActiveSlide(index)}
+                  aria-label={`Ver imagen ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         <div className="sumate-gallery-action">
           <h2>¿Querés participar?</h2>
           <p>Completá tus datos y nos pondremos en contacto para coordinar cómo podés sumarte.</p>
