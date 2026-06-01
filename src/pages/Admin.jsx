@@ -27,6 +27,7 @@ const Admin = ({ user, content, loading, onSave }) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [activeTab, setActiveTab] = useState('homepage');
   const [openItems, setOpenItems] = useState({});
+  const [savingItems, setSavingItems] = useState({});
 
   const [nosotrosContent, setNosotrosContent] = useState({});
   const [sumateContent, setSumateContent] = useState({});
@@ -180,17 +181,36 @@ const Admin = ({ user, content, loading, onSave }) => {
 
   const isItemOpen = (section, item, index) => Boolean(openItems[getItemKey(section, item, index)]);
 
+  const saveItemChanges = async (section, item, index, saveChanges, successMessage = 'Se ha guardado correctamente.') => {
+    const key = getItemKey(section, item, index);
+    setError('');
+    setSuccessMessage('');
+    setSavingItems((prev) => ({ ...prev, [key]: true }));
+
+    try {
+      await saveChanges();
+      setSuccessMessage(successMessage);
+    } catch (err) {
+      console.error('Item save error:', err);
+      setError(`No se pudo guardar. ${err?.message || 'Revisa la conexión o configuración de Firebase.'}`);
+    } finally {
+      setSavingItems((prev) => ({ ...prev, [key]: false }));
+    }
+  };
+
   const renderEditableItem = ({
     section,
     item,
     index,
     title,
     summary,
+    onSave,
     onDelete,
     children,
     className = 'editor-card',
   }) => {
     const open = isItemOpen(section, item, index);
+    const saving = Boolean(savingItems[getItemKey(section, item, index)]);
 
     return (
       <div className={`${className} ${open ? 'is-open' : ''}`} key={item?.id || index}>
@@ -209,11 +229,24 @@ const Admin = ({ user, content, loading, onSave }) => {
             >
               {open ? '▴' : '✎'}
             </button>
+            {onSave && (
+              <button
+                type="button"
+                className="btn-item-action"
+                onClick={() => saveItemChanges(section, item, index, onSave)}
+                disabled={saving}
+                aria-label={`Guardar ${title}`}
+                title="Guardar"
+              >
+                {saving ? '…' : '✓'}
+              </button>
+            )}
             {onDelete && (
               <button
                 type="button"
-                className="btn-delete compact"
-                onClick={onDelete}
+                className="btn-item-action"
+                onClick={() => saveItemChanges(section, item, index, onDelete, 'Se ha eliminado correctamente.')}
+                disabled={saving}
                 aria-label={`Eliminar ${title}`}
                 title="Eliminar"
               >
@@ -290,46 +323,40 @@ const Admin = ({ user, content, loading, onSave }) => {
     openItem('cursos-items', newCourse);
   };
 
-  const deleteCard = (index) => {
-    setFormState((prev) => ({
-      ...prev,
-      cards: prev.cards.filter((_, idx) => idx !== index),
-    }));
+  const deleteCard = async (index) => {
+    const cards = (formState.cards || []).filter((_, idx) => idx !== index);
+    await saveSiteContent({ cards });
+    setFormState((prev) => ({ ...prev, cards }));
   };
 
-  const deleteEvent = (index) => {
-    setFormState((prev) => ({
-      ...prev,
-      events: (prev.events || []).filter((_, idx) => idx !== index),
-    }));
+  const deleteEvent = async (index) => {
+    const events = (formState.events || []).filter((_, idx) => idx !== index);
+    await saveSiteContent({ events });
+    setFormState((prev) => ({ ...prev, events }));
   };
 
-  const deleteNosotrosCard = (index) => {
-    setNosotrosContent((prev) => ({
-      ...prev,
-      teamCards: (prev.teamCards || []).filter((_, idx) => idx !== index),
-    }));
+  const deleteNosotrosCard = async (index) => {
+    const teamCards = (nosotrosContent.teamCards || []).filter((_, idx) => idx !== index);
+    await saveNosotrosContent({ teamCards });
+    setNosotrosContent((prev) => ({ ...prev, teamCards }));
   };
 
-  const deleteSumateCarouselImage = (index) => {
-    setSumateContent((prev) => ({
-      ...prev,
-      carouselImages: (prev.carouselImages || []).filter((_, idx) => idx !== index),
-    }));
+  const deleteSumateCarouselImage = async (index) => {
+    const carouselImages = (sumateContent.carouselImages || []).filter((_, idx) => idx !== index);
+    await saveSumateContent({ carouselImages });
+    setSumateContent((prev) => ({ ...prev, carouselImages }));
   };
 
-  const deleteProyecto = (index) => {
-    setProyectosContent((prev) => ({
-      ...prev,
-      items: (prev.items || []).filter((_, idx) => idx !== index),
-    }));
+  const deleteProyecto = async (index) => {
+    const items = (proyectosContent.items || []).filter((_, idx) => idx !== index);
+    await saveProyectosContent({ items });
+    setProyectosContent((prev) => ({ ...prev, items }));
   };
 
-  const deleteCurso = (index) => {
-    setCursosContent((prev) => ({
-      ...prev,
-      items: (prev.items || []).filter((_, idx) => idx !== index),
-    }));
+  const deleteCurso = async (index) => {
+    const items = (cursosContent.items || []).filter((_, idx) => idx !== index);
+    await saveCursosContent({ items });
+    setCursosContent((prev) => ({ ...prev, items }));
   };
 
   const handleSave = async () => {
@@ -460,7 +487,7 @@ const Admin = ({ user, content, loading, onSave }) => {
               <h3>Carrusel de novedades</h3>
               <p className="admin-note">Cada novedad se muestra como una diapositiva del carrusel de inicio.</p>
               <button className="btn-nav" onClick={addNewCard}>
-                Agregar nueva novedad arriba
+                Agregar
               </button>
               {formState?.cards?.map((card, index) => renderEditableItem({
                 section: 'home-cards',
@@ -468,6 +495,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                 index,
                 title: card.titulo || `Novedad ${index + 1}`,
                 summary: card.desc || 'Sin descripción cargada',
+                onSave: () => saveSiteContent({ cards: formState.cards || [] }),
                 onDelete: () => deleteCard(index),
                 children: (
                   <>
@@ -504,6 +532,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                 index,
                 title: event.titulo || `Evento ${index + 1}`,
                 summary: [event.fecha, event.lugar].filter(Boolean).join(' · ') || 'Sin fecha ni lugar cargados',
+                onSave: () => saveSiteContent({ events: formState.events || [] }),
                 onDelete: () => deleteEvent(index),
                 className: 'editor-event',
                 children: (
@@ -602,7 +631,7 @@ const Admin = ({ user, content, loading, onSave }) => {
             <div className="editor-block">
               <h3>Equipo - Miembros</h3>
               <button className="btn-nav" onClick={addNewNosotrosCard}>
-                Agregar nuevo miembro arriba
+                Agregar
               </button>
               {nosotrosContent?.teamCards?.map((card, index) => renderEditableItem({
                 section: 'nosotros-team',
@@ -610,6 +639,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                 index,
                 title: card.nombre || `Miembro ${index + 1}`,
                 summary: card.descripcion || 'Sin descripción cargada',
+                onSave: () => saveNosotrosContent({ teamCards: nosotrosContent.teamCards || [] }),
                 onDelete: () => deleteNosotrosCard(index),
                 children: (
                   <>
@@ -683,7 +713,7 @@ const Admin = ({ user, content, loading, onSave }) => {
             <div className="editor-block">
               <h3>Fotos del carrusel</h3>
               <button className="btn-nav" onClick={addNewSumateCarouselImage}>
-                Agregar foto arriba
+                Agregar
               </button>
               {sumateContent?.carouselImages?.map((image, index) => renderEditableItem({
                 section: 'sumate-carousel',
@@ -691,6 +721,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                 index,
                 title: image.alt || `Foto ${index + 1}`,
                 summary: image.url || 'Sin URL cargada',
+                onSave: () => saveSumateContent({ carouselImages: sumateContent.carouselImages || [] }),
                 onDelete: () => deleteSumateCarouselImage(index),
                 children: (
                   <>
@@ -750,7 +781,7 @@ const Admin = ({ user, content, loading, onSave }) => {
             <div className="editor-block">
               <h3>Listado de proyectos</h3>
               <button className="btn-nav" onClick={addNewProyecto}>
-                Agregar proyecto arriba
+                Agregar
               </button>
               {proyectosContent?.items?.map((item, index) => renderEditableItem({
                 section: 'proyectos-items',
@@ -758,6 +789,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                 index,
                 title: item.titulo || `Proyecto ${index + 1}`,
                 summary: [item.estado, item.descripcion].filter(Boolean).join(' · ') || 'Sin descripción cargada',
+                onSave: () => saveProyectosContent({ items: proyectosContent.items || [] }),
                 onDelete: () => deleteProyecto(index),
                 children: (
                   <>
@@ -837,7 +869,7 @@ const Admin = ({ user, content, loading, onSave }) => {
             <div className="editor-block">
               <h3>Listado de cursos y talleres</h3>
               <button className="btn-nav" onClick={addNewCurso}>
-                Agregar curso o taller arriba
+                Agregar
               </button>
               {cursosContent?.items?.map((item, index) => renderEditableItem({
                 section: 'cursos-items',
@@ -845,6 +877,7 @@ const Admin = ({ user, content, loading, onSave }) => {
                 index,
                 title: item.nombre || `Curso/Taller ${index + 1}`,
                 summary: [item.estado, item.fecha, item.lugar].filter(Boolean).join(' · ') || 'Sin fecha ni lugar cargados',
+                onSave: () => saveCursosContent({ items: cursosContent.items || [] }),
                 onDelete: () => deleteCurso(index),
                 children: (
                   <>
