@@ -1217,6 +1217,52 @@ body {
     margin-top: 10px;
 }
 
+.image-upload-field {
+    display: grid;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.image-upload-field label {
+    margin-bottom: 0;
+}
+
+.image-drop-zone {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: 112px;
+    padding: 18px;
+    border: 2px dashed rgba(0, 86, 179, 0.45);
+    border-radius: 12px;
+    background: rgba(0, 86, 179, 0.05);
+    color: var(--azul-principal);
+    cursor: pointer;
+    text-align: center;
+    transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+}
+
+.image-drop-zone:hover,
+.image-drop-zone.is-dragging {
+    border-color: var(--naranja-logo);
+    background: rgba(255, 140, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.image-drop-zone.is-uploading {
+    cursor: wait;
+    opacity: 0.72;
+}
+
+.image-file-input {
+    display: none;
+}
+
+.image-upload-note {
+    color: #8a5b00;
+    font-size: 0.9rem;
+}
+
 .form-success {
     color: #27ae60;
     margin-top: 10px;

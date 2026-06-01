@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ImageUploadField from '../components/ImageUploadField';
 import {
   ADMIN_EMAIL,
   logout as firebaseLogout,
@@ -227,22 +228,13 @@ const Admin = ({ user, content, loading, onSave }) => {
   };
 
   const renderHeroImageField = (pageContent, page) => (
-    <label>
-      URL de la imagen de portada
-      <input
-        type="url"
-        placeholder="https://ejemplo.com/portada.jpg"
-        value={pageContent?.heroImage || ''}
-        onChange={(e) => updateField('heroImage', e.target.value, page)}
-      />
-      {pageContent?.heroImage && (
-        <img
-          src={pageContent.heroImage}
-          alt="Preview portada"
-          style={{ maxWidth: '400px', marginTop: '10px', borderRadius: '8px', display: 'block' }}
-        />
-      )}
-    </label>
+    <ImageUploadField
+      label="URL de la imagen de portada"
+      value={pageContent?.heroImage || ''}
+      onChange={(value) => updateField('heroImage', value, page)}
+      previewAlt="Preview portada"
+      previewWidth="400px"
+    />
   );
 
 
@@ -435,25 +427,13 @@ const Admin = ({ user, content, loading, onSave }) => {
           <>
             <div className="editor-block">
               <h3>Imagen de Portada</h3>
-              <label>
-                URL de la imagen del hero
-                <input
-                  type="url"
-                  placeholder="https://ejemplo.com/portada.jpg"
-                  value={formState?.heroImage || ''}
-                  onChange={(e) => updateField('heroImage', e.target.value)}
-                />
-              </label>
-              {formState?.heroImage && (
-                <label>
-                  Preview
-                  <img
-                    src={formState.heroImage}
-                    alt="Preview portada"
-                    style={{ maxWidth: '400px', marginTop: '10px', borderRadius: '8px' }}
-                  />
-                </label>
-              )}
+              <ImageUploadField
+                label="URL de la imagen del hero"
+                value={formState?.heroImage || ''}
+                onChange={(value) => updateField('heroImage', value)}
+                previewAlt="Preview portada"
+                previewWidth="400px"
+              />
             </div>
 
             <div className="editor-block">
@@ -506,21 +486,11 @@ const Admin = ({ user, content, loading, onSave }) => {
                       onChange={(e) => updateCard(index, 'desc', e.target.value)}
                     />
                   </label>
-                  <label>
-                    URL de la imagen
-                    <input
-                      type="url"
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      value={card.imagen}
-                      onChange={(e) => updateCard(index, 'imagen', e.target.value)}
-                    />
-                  </label>
-                  {card.imagen && (
-                    <label>
-                      Preview
-                      <img src={card.imagen} alt="Preview" style={{ maxWidth: '200px', marginTop: '10px', borderRadius: '8px' }} />
-                    </label>
-                  )}
+                  <ImageUploadField
+                    value={card.imagen}
+                    onChange={(value) => updateCard(index, 'imagen', value)}
+                    previewWidth="200px"
+                  />
                   </>
                 ),
               }))}
@@ -658,21 +628,11 @@ const Admin = ({ user, content, loading, onSave }) => {
                       onChange={(e) => updateNosotrosCard(index, 'descripcion', e.target.value)}
                     />
                   </label>
-                  <label>
-                    URL de la imagen
-                    <input
-                      type="url"
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      value={card.imagen}
-                      onChange={(e) => updateNosotrosCard(index, 'imagen', e.target.value)}
-                    />
-                  </label>
-                  {card.imagen && (
-                    <label>
-                      Preview
-                      <img src={card.imagen} alt="Preview" style={{ maxWidth: '200px', marginTop: '10px', borderRadius: '8px' }} />
-                    </label>
-                  )}
+                  <ImageUploadField
+                    value={card.imagen}
+                    onChange={(value) => updateNosotrosCard(index, 'imagen', value)}
+                    previewWidth="200px"
+                  />
                   </>
                 ),
               }))}
@@ -734,15 +694,11 @@ const Admin = ({ user, content, loading, onSave }) => {
                 onDelete: () => deleteSumateCarouselImage(index),
                 children: (
                   <>
-                  <label>
-                    URL de la imagen
-                    <input
-                      type="url"
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      value={image.url || ''}
-                      onChange={(e) => updateSumateCarouselImage(index, 'url', e.target.value)}
-                    />
-                  </label>
+                  <ImageUploadField
+                    value={image.url || ''}
+                    onChange={(value) => updateSumateCarouselImage(index, 'url', value)}
+                    previewAlt="Preview carrusel"
+                  />
                   <label>
                     Texto alternativo
                     <input
@@ -752,12 +708,6 @@ const Admin = ({ user, content, loading, onSave }) => {
                       onChange={(e) => updateSumateCarouselImage(index, 'alt', e.target.value)}
                     />
                   </label>
-                  {image.url && (
-                    <label>
-                      Preview
-                      <img src={image.url} alt="Preview carrusel" style={{ maxWidth: '240px', marginTop: '10px', borderRadius: '8px' }} />
-                    </label>
-                  )}
                   </>
                 ),
               }))}
@@ -840,21 +790,11 @@ const Admin = ({ user, content, loading, onSave }) => {
                       ))}
                     </select>
                   </label>
-                  <label>
-                    URL de la imagen
-                    <input
-                      type="url"
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      value={item.imagen || ''}
-                      onChange={(e) => updateProyecto(index, 'imagen', e.target.value)}
-                    />
-                  </label>
-                  {item.imagen && (
-                    <label>
-                      Preview
-                      <img src={item.imagen} alt="Preview proyecto" style={{ maxWidth: '240px', marginTop: '10px', borderRadius: '8px' }} />
-                    </label>
-                  )}
+                  <ImageUploadField
+                    value={item.imagen || ''}
+                    onChange={(value) => updateProyecto(index, 'imagen', value)}
+                    previewAlt="Preview proyecto"
+                  />
                   </>
                 ),
               }))}
@@ -963,21 +903,11 @@ const Admin = ({ user, content, loading, onSave }) => {
                       onChange={(e) => updateCurso(index, 'link', e.target.value)}
                     />
                   </label>
-                  <label>
-                    URL de la imagen
-                    <input
-                      type="url"
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      value={item.imagen || ''}
-                      onChange={(e) => updateCurso(index, 'imagen', e.target.value)}
-                    />
-                  </label>
-                  {item.imagen && (
-                    <label>
-                      Preview
-                      <img src={item.imagen} alt="Preview curso" style={{ maxWidth: '240px', marginTop: '10px', borderRadius: '8px' }} />
-                    </label>
-                  )}
+                  <ImageUploadField
+                    value={item.imagen || ''}
+                    onChange={(value) => updateCurso(index, 'imagen', value)}
+                    previewAlt="Preview curso"
+                  />
                   </>
                 ),
               }))}

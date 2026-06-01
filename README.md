@@ -7,7 +7,7 @@ Sitio web de la Fundación Construir Juntos en Yerba Buena, Tucumán.
 - **Panel de administración**: Solo el administrador puede editar contenido.
 - **Cards dinámicas**: Agregar, editar y eliminar cards con imágenes.
 - **Eventos del calendario**: Gestionar eventos próximos.
-- **Subida de imágenes**: Subir imágenes a Firebase Storage.
+- **Subida de imágenes**: Arrastrar imágenes al panel de administración para subirlas a Cloudinary.
 
 ## Configuración de Firebase
 
@@ -16,16 +16,33 @@ Sitio web de la Fundación Construir Juntos en Yerba Buena, Tucumán.
 3. Crea un usuario administrador con email `martinaledesma2@gmail.com`.
 4. Habilita Email/Password en Authentication.
 5. Agrega `localhost` a Authorized domains.
-6. Sube las reglas de Firestore y Storage desde los archivos `.rules`.
+6. Sube las reglas de Firestore desde `firestore.rules`.
 
 ## Instalación
 
 ```bash
 npm install
+cp .env.example .env
 npm run dev
 ```
 
 Abre en `http://localhost:5173`.
+
+## Configuración de Cloudinary
+
+1. Crea una cuenta o inicia sesión en Cloudinary.
+2. Copia el `Cloud name` del panel principal.
+3. En `Settings > Upload > Upload presets`, crea un preset con `Signing Mode: Unsigned`.
+4. Copia `.env.example` como `.env` y completa:
+
+```bash
+VITE_CLOUDINARY_CLOUD_NAME=tu_cloud_name
+VITE_CLOUDINARY_UPLOAD_PRESET=tu_unsigned_upload_preset
+```
+
+5. En Netlify, agrega las mismas variables en `Site configuration > Environment variables`.
+
+El preset debe limitar formatos permitidos, tamaño máximo de 10 MB y carpeta cuando publiques el sitio. No coloques el `API Secret` de Cloudinary en variables que comiencen con `VITE_`: esas variables quedan visibles en el navegador.
 
 ## Panel de admin
 
@@ -35,5 +52,6 @@ Abre en `http://localhost:5173`.
 
 ## Reglas de seguridad
 
-- Solo el admin puede escribir en Firestore y subir imágenes.
+- Solo el admin puede escribir contenido en Firestore.
+- La subida directa a Cloudinary usa un preset `Unsigned`. Su nombre queda visible en el navegador, por eso el preset debe restringir formatos y tamaño máximo.
 - Todos pueden leer el contenido público.
