@@ -70,18 +70,49 @@ const WhatsAppIcon = () => (
   </svg>
 );
 
-const WhatsAppButton = ({ className = '', label = 'WhatsApp' }) => (
-  <button
-    type="button"
-    className={`whatsapp-button ${className}`.trim()}
-    aria-label={`${label} (próximamente)`}
-    aria-disabled="true"
-    title={`${label} (próximamente)`}
-  >
-    <WhatsAppIcon />
-    <span>{label}</span>
-  </button>
-);
+const whatsappHref = 'https://wa.me/5493816384353';
+
+const WhatsAppButton = ({ className = '', label = 'WhatsApp' }) => {
+  const accessibleLabel = label === 'WhatsApp' ? 'Abrir WhatsApp' : `${label} por WhatsApp`;
+
+  return (
+    <a
+      href={whatsappHref}
+      className={`whatsapp-button ${className}`.trim()}
+      aria-label={accessibleLabel}
+      title={accessibleLabel}
+      target="_blank"
+      rel="noreferrer"
+    >
+      <WhatsAppIcon />
+      <span>{label}</span>
+    </a>
+  );
+};
+
+const DescendingCounter = ({ start, end, suffix = '' }) => {
+  const [value, setValue] = useState(start);
+
+  useEffect(() => {
+    setValue(start);
+
+    const duration = 1600;
+    const startedAt = Date.now();
+    const interval = window.setInterval(() => {
+      const progress = Math.min((Date.now() - startedAt) / duration, 1);
+      const next = Math.round(start - ((start - end) * progress));
+      setValue(next);
+
+      if (progress >= 1) {
+        window.clearInterval(interval);
+      }
+    }, 28);
+
+    return () => window.clearInterval(interval);
+  }, [start, end]);
+
+  return <>{value}{suffix}</>;
+};
 
 function App() {
   const [user, setUser] = useState(null);
@@ -207,38 +238,40 @@ function App() {
               <main className="home-shell">
                 <section className="home-action-bar" aria-label="Accesos destacados">
                   <div className="home-action-item">
-                    <span>Ubicación</span>
-                    <strong>{content.contactAddress || defaultContent.contactAddress}</strong>
+                    <span>Fichas escolares</span>
+                    <strong>400 gratuitas</strong>
                   </div>
                   <div className="home-action-item">
-                    <span>Actividades</span>
-                    <strong>{acciones.length}+ iniciativas activas</strong>
+                    <span>Escuelas</span>
+                    <strong>3 refaccionadas</strong>
                   </div>
                   <div className="home-action-item">
-                    <span>Agenda</span>
-                    <strong>{eventosProximos.length || eventosData.length}+ eventos</strong>
+                    <span>Salud visual</span>
+                    <strong>300+ vecinos atendidos</strong>
                   </div>
                   <WhatsAppButton className="home-action-button" label="Contactar" />
                 </section>
 
                 <section className="home-stats" aria-label="Resumen de impacto">
                   <article>
-                    <strong>{acciones.length}+</strong>
-                    <p>Novedades, campañas y espacios comunitarios para acompañar a familias.</p>
+                    <strong><DescendingCounter start={560} end={400} /></strong>
+                    <p>Fichas médicas escolares gratuitas para acompañar trayectorias educativas.</p>
                   </article>
                   <article>
-                    <strong>{eventosProximos.length || eventosData.length}+</strong>
-                    <p>Eventos y encuentros pensados para sostener el trabajo territorial.</p>
+                    <strong><DescendingCounter start={18} end={3} /></strong>
+                    <p>Escuelas refaccionadas junto a la comunidad educativa.</p>
                   </article>
                   <article>
-                    <strong>Yerba Buena</strong>
-                    <p>Presencia cercana desde Lola Mora y Brasil, con mirada comunitaria.</p>
+                    <strong><DescendingCounter start={480} end={300} suffix="+" /></strong>
+                    <p>Vecinos atendidos en salud visual integral y gratuita.</p>
                   </article>
                 </section>
 
                 <section id="novedades" className="home-feature-section">
                   <div className="home-section-heading">
-                    <h2>Novedades</h2>
+                    <h2 className="display-subtitle">
+                      <span className="title-line title-line-blue">Novedades</span>
+                    </h2>
                     {novedadesSlides.length > 1 && (
                       <div className="home-heading-controls" aria-label="Controles de novedades">
                         <button type="button" onClick={() => moveSlide(-1)} aria-label="Ver novedad anterior">
@@ -284,7 +317,10 @@ function App() {
 
                 <section className="home-services-section" aria-labelledby="acciones-title">
                   <div className="home-section-heading">
-                    <h2 id="acciones-title">Acciones comunitarias</h2>
+                    <h2 id="acciones-title" className="display-subtitle">
+                      <span className="title-line title-line-blue">Acciones</span>
+                      <span className="title-line title-line-orange">comunitarias</span>
+                    </h2>
                     <Link className="home-more-link" to="/proyectos">Ver más</Link>
                   </div>
                   <div className="home-services-grid">
@@ -306,7 +342,10 @@ function App() {
                 <div className="home-dark-card">
                   <div className="home-dark-info">
                     <span>Territorio</span>
-                    <h2>Construimos comunidad desde el encuentro cotidiano</h2>
+                    <h2 className="display-subtitle display-subtitle-dark">
+                      <span className="title-line title-line-blue">Construimos comunidad</span>
+                      <span className="title-line title-line-white">desde el encuentro cotidiano</span>
+                    </h2>
                     <p>
                       Nos encontramos en {content.contactAddress || defaultContent.contactAddress}.
                       Desde allí coordinamos campañas, talleres y actividades abiertas.
@@ -339,7 +378,10 @@ function App() {
 
                 <div className="home-events-panel">
                   <div className="home-section-heading home-section-heading-light">
-                    <h2>Próximos eventos</h2>
+                    <h2 className="display-subtitle">
+                      <span className="title-line title-line-blue">Próximos</span>
+                      <span className="title-line title-line-white">eventos</span>
+                    </h2>
                     <WhatsAppButton className="home-more-link" label="Consultar" />
                   </div>
                   <div className="home-events-grid">

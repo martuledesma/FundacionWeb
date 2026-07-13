@@ -42,6 +42,14 @@ const getStatusClass = (status = '') => {
   return 'feature-status status-active';
 };
 
+const getStatusPriority = (status = '') => {
+  const normalized = status.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  if (normalized.includes('ultimos cupos')) return 0;
+  if (normalized.includes('activo')) return 1;
+  if (normalized.includes('finalizado')) return 3;
+  return 2;
+};
+
 const getStatusLabel = (status) => (
   status === 'Últimos cupos' ? '⚠ Últimos cupos' : status
 );
@@ -81,23 +89,39 @@ const Cursos = () => {
   };
 
   useEffect(() => {
+    let isMounted = true;
+    const fallbackTimer = window.setTimeout(() => {
+      if (isMounted) setContentLoaded(true);
+    }, 4500);
+
     const loadContent = async () => {
       try {
         const data = await getCursosContent();
-        if (data) {
+        if (isMounted && data) {
           setContent(data);
         }
       } catch (error) {
         console.error('Error loading cursos content:', error);
       } finally {
-        setContentLoaded(true);
+        if (isMounted) {
+          window.clearTimeout(fallbackTimer);
+          setContentLoaded(true);
+        }
       }
     };
 
     loadContent();
+
+    return () => {
+      isMounted = false;
+      window.clearTimeout(fallbackTimer);
+    };
   }, []);
 
-  const courses = content.items?.length ? content.items : defaultCourses;
+  const courses = (content.items?.length ? content.items : defaultCourses)
+    .map((course, index) => ({ course, index }))
+    .sort((a, b) => getStatusPriority(a.course.estado) - getStatusPriority(b.course.estado) || a.index - b.index)
+    .map(({ course }) => course);
   const configuredGalleryImages = (content.galleryImages || [])
     .filter((image) => image?.url)
     .slice(0, 3);
@@ -147,7 +171,7 @@ const Cursos = () => {
         <div className="courses-carousel-header">
           <div>
             <span>{content.carouselEyebrow || 'Aprender haciendo'}</span>
-            <h2>{content.carouselTitle || 'Explorá nuestros cursos y talleres'}</h2>
+            <h2 className="display-subtitle">{content.carouselTitle || 'Explorá nuestros cursos y talleres'}</h2>
           </div>
           <div className="courses-carousel-controls">
             <button type="button" onClick={() => scrollCourses(-1)} aria-label="Ver cursos anteriores">
@@ -210,7 +234,7 @@ const Cursos = () => {
           <div className="courses-gallery-header">
             <div>
               <span>{content.galleryEyebrow || 'Momentos compartidos'}</span>
-              <h2>{content.galleryTitle || 'Aprender también es encontrarnos'}</h2>
+              <h2 className="display-subtitle">{content.galleryTitle || 'Aprender también es encontrarnos'}</h2>
             </div>
             <div className="courses-carousel-controls">
               <button type="button" onClick={() => scrollGallery(-1)} aria-label="Ver fotos anteriores">

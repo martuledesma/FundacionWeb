@@ -1,9 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { getNosotrosContent } from '../firebase';
 import useHeroImageReady from '../hooks/useHeroImageReady';
 
-const defaultClosingValues = ['Servicio', 'Trabajo', 'Impacto'];
+const defaultAlliances = [
+  {
+    name: 'Aliado local',
+    type: 'Entidad colaboradora',
+  },
+  {
+    name: 'Profesional voluntario',
+    type: 'Persona patrocinadora',
+  },
+  {
+    name: 'Comercio amigo',
+    type: 'Apoyo comunitario',
+  },
+  {
+    name: 'Institución educativa',
+    type: 'Trabajo articulado',
+  },
+];
 
 function Nosotros() {
   const [content, setContent] = useState({});
@@ -47,10 +63,7 @@ function Nosotros() {
 
   const heroImage = content.heroImage || '';
   const heroReady = useHeroImageReady(heroImage, !contentLoaded);
-  const closingValues = Array.from(
-    { length: 3 },
-    (_, index) => content.closingValues?.[index] || defaultClosingValues[index]
-  );
+  const alliances = content.alliances?.length ? content.alliances : defaultAlliances;
 
   if (!heroReady) {
     return (
@@ -88,7 +101,10 @@ function Nosotros() {
         <div className="team-carousel-header">
           <div>
             <span>Nosotros</span>
-            <h2>Las personas detrás de cada proyecto</h2>
+            <h2 className="display-subtitle">
+              <span className="title-line title-line-blue">Las personas</span>
+              <span className="title-line title-line-orange">detrás de cada proyecto</span>
+            </h2>
           </div>
           <div className="team-carousel-controls">
             <button type="button" onClick={() => scrollTeam(-1)} aria-label="Ver integrantes anteriores">
@@ -136,30 +152,36 @@ function Nosotros() {
         </div>
       </section>
 
-      <section className="nosotros-closing" aria-label="Cómo trabajamos">
-        <div className="nosotros-closing-values">
-          {closingValues.map((value, index) => (
-            <div key={`${value}-${index}`}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{value}</strong>
-            </div>
-          ))}
+      <section className="alliances-section" aria-labelledby="alliances-title">
+        <div className="alliances-header">
+          <span>Red de apoyo</span>
+          <h2 id="alliances-title">Nuestras alianzas</h2>
         </div>
-        <div className="nosotros-closing-cta">
-          <div>
-            <h2>{content.closingTitle || 'Construimos comunidad con acciones concretas'}</h2>
-            <p>
-              {content.closingText || 'Conocé nuestros proyectos o sumate para acompañar el trabajo de la fundación.'}
-            </p>
-          </div>
-          <div className="nosotros-closing-actions">
-            <Link to="/proyectos">
-              {content.closingProjectsLabel || 'Conocé nuestros proyectos'}
-            </Link>
-            <Link to="/sumate">
-              {content.closingJoinLabel || 'Sumate'}
-            </Link>
-          </div>
+        <div className="alliances-grid">
+          {alliances.map((alliance, index) => {
+            const name = alliance.name || alliance.nombre || `Alianza ${index + 1}`;
+            const type = alliance.type || alliance.tipo || 'Persona o entidad patrocinadora';
+            const image = alliance.image || alliance.imagen || alliance.logo || '';
+            const initials = name
+              .split(' ')
+              .filter(Boolean)
+              .slice(0, 2)
+              .map((word) => word[0])
+              .join('')
+              .toUpperCase();
+
+            return (
+              <article className="alliance-card" key={`${name}-${index}`}>
+                <span className="alliance-mark">
+                  {image ? <img src={image} alt={name} loading="lazy" decoding="async" /> : initials}
+                </span>
+                <div>
+                  <h3>{name}</h3>
+                  <p>{type}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>

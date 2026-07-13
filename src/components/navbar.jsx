@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../Assets/logo.jpg';
+import logo from '../Assets/logo.png';
 
 const Navbar = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [hasScrolled, setHasScrolled] = useState(false);
     const closeMenu = () => setIsMenuOpen(false);
 
+    useEffect(() => {
+        const handleScroll = () => {
+            setHasScrolled(window.scrollY > 24);
+        };
+
+        handleScroll();
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     return (
-        <nav className="navbar">
+        <nav className={`navbar ${hasScrolled ? 'navbar-scrolled' : ''}`}>
             <div className="logo-container">
                 <Link to="/" onClick={closeMenu}>
                     <img src={logo} alt="Logo Fundación" className="logo-img" />

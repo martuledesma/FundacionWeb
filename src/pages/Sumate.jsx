@@ -102,9 +102,18 @@ const Sumate = () => {
 
       <section className="sumate-content">
         <div className="sumate-text">
-          <p>
-            {content.content || 'Tu ayuda es fundamental para seguir transformando Yerba Buena. Podés colaborar como voluntario o con donaciones.'}
-          </p>
+          {content.content ? (
+            <p className="sumate-highlight-text">{content.content}</p>
+          ) : (
+            <p className="sumate-highlight-text" aria-label="Tu ayuda es fundamental para seguir transformando Yerba Buena. Podés colaborar como voluntario o con donaciones.">
+              <span className="sumate-highlight-line sumate-highlight-blue">
+                Tu ayuda es fundamental para seguir transformando Yerba Buena.
+              </span>
+              <span className="sumate-highlight-line sumate-highlight-orange">
+                Podés colaborar como voluntario o con donaciones.
+              </span>
+            </p>
+          )}
           {content.contactInfo && (
             <p>
               {content.contactInfo}
@@ -171,7 +180,10 @@ const Sumate = () => {
           </div>
         )}
         <div className="sumate-gallery-action">
-          <h2>¿Querés participar?</h2>
+          <h2 className="display-subtitle display-subtitle-dark">
+            <span className="title-line title-line-blue">¿Querés</span>
+            <span className="title-line title-line-white">participar?</span>
+          </h2>
           <p>Completá tus datos y nos pondremos en contacto para coordinar cómo podés sumarte.</p>
           <button type="button" className="btn-nav sumate-form-button" onClick={() => setIsFormOpen(true)}>
             Completar formulario
