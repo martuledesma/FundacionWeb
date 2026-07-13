@@ -149,7 +149,7 @@ const Cursos = () => {
       <header
         className="page-hero page-hero-photo"
         style={heroImage ? {
-          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+          backgroundImage: `linear-gradient(90deg, rgba(13, 76, 111, 0.54), rgba(255, 255, 255, 0.08) 46%, rgba(246, 189, 79, 0.16)), url('${heroImage}')`,
         } : undefined}
       >
         <div className="page-hero-content">

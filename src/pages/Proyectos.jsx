@@ -56,10 +56,35 @@ const getStatusLabel = (status) => (
   status === 'Últimos cupos' ? '⚠ Últimos cupos' : status
 );
 
+const projectFilters = [
+  { id: 'todos', label: 'Todos' },
+  { id: 'salud', label: 'Salud' },
+  { id: 'educacion', label: 'Educación' },
+  { id: 'recreativos', label: 'Recreativos' },
+];
+
+const normalizeText = (value = '') => (
+  value.toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+);
+
+const getProjectCategory = (project = {}) => {
+  const explicitCategory = normalizeText(project.categoria || project.category || project.area || '');
+  if (explicitCategory.includes('salud')) return 'salud';
+  if (explicitCategory.includes('educacion') || explicitCategory.includes('educativo')) return 'educacion';
+  if (explicitCategory.includes('recreativo') || explicitCategory.includes('recreacion')) return 'recreativos';
+
+  const searchableText = normalizeText(`${project.titulo || ''} ${project.nombre || ''} ${project.descripcion || ''}`);
+  if (searchableText.match(/salud|visual|oftalm|anteojo|medic|vacun|desparasit/)) return 'salud';
+  if (searchableText.match(/educacion|educativo|escuela|escolar|oficio|curso|taller|aprendiz/)) return 'educacion';
+  if (searchableText.match(/recrea|deporte|juego|cultura|arte|encuentro|bienestar animal|mascota/)) return 'recreativos';
+  return 'recreativos';
+};
+
 const Proyectos = () => {
   const [content, setContent] = useState({});
   const [contentLoaded, setContentLoaded] = useState(false);
   const [expandedProjects, setExpandedProjects] = useState({});
+  const [activeFilter, setActiveFilter] = useState('todos');
   const areasTrackRef = useRef(null);
 
   const toggleProjectExpand = (index) => {
@@ -110,6 +135,9 @@ const Proyectos = () => {
   }, []);
 
   const projects = content.items?.length ? content.items : defaultProjects;
+  const visibleProjects = activeFilter === 'todos'
+    ? projects
+    : projects.filter((project) => getProjectCategory(project) === activeFilter);
   const heroImage = content.heroImage || projects.find((project) => project.imagen)?.imagen || '';
   const heroReady = useHeroImageReady(heroImage, !contentLoaded);
 
@@ -147,7 +175,7 @@ const Proyectos = () => {
       <header
         className="page-hero page-hero-photo"
         style={heroImage ? {
-          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+          backgroundImage: `linear-gradient(90deg, rgba(13, 76, 111, 0.54), rgba(255, 255, 255, 0.08) 46%, rgba(246, 189, 79, 0.16)), url('${heroImage}')`,
         } : undefined}
       >
         <div className="page-hero-content">
@@ -208,9 +236,21 @@ const Proyectos = () => {
             <span className="title-line title-line-white">activos</span>
           </h2>
         </div>
+        <div className="project-filter-tabs" aria-label="Filtrar proyectos">
+          {projectFilters.map((filter) => (
+            <button
+              type="button"
+              key={filter.id}
+              className={activeFilter === filter.id ? 'active' : ''}
+              onClick={() => setActiveFilter(filter.id)}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
         <div className="feature-grid proyectos-feature-grid">
-          {projects.map((project, index) => (
-            <article className="feature-card" key={project.id || index}>
+          {visibleProjects.map((project, index) => (
+            <article className="feature-card" key={project.id || project.titulo || index}>
               {project.imagen && (
                 <img src={project.imagen} alt={project.titulo} className="feature-card-img" loading="lazy" decoding="async" />
               )}
@@ -235,6 +275,9 @@ const Proyectos = () => {
             </article>
           ))}
         </div>
+        {!visibleProjects.length && (
+          <p className="project-empty-state">No hay proyectos cargados en esta categoría por ahora.</p>
+        )}
       </section>
     </div>
   );

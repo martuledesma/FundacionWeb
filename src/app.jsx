@@ -221,7 +221,7 @@ function App() {
               <header
                 className="home-hero"
                 style={heroBackground ? {
-                  backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroBackground}')`,
+                  backgroundImage: `linear-gradient(90deg, rgba(13, 76, 111, 0.52), rgba(255, 255, 255, 0.08) 46%, rgba(246, 189, 79, 0.16)), url('${heroBackground}')`,
                 } : undefined}
               >
                 <div className="home-hero-content">
@@ -362,12 +362,13 @@ function App() {
                   >
                     <iframe
                       title="Mapa de ubicación Fundación Construir Juntos"
-                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.432658428469!2d-65.313437!3d-26.815234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94225d3ad0971b31%3A0x33e5c94c9a544f80!2sYerba%20Buena%2C%20Tucum%C3%A1n!5e0!3m2!1ses!2sar!4v1710880000000!5m2!1ses!2sar"
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3560.9956103419063!2d-65.2839311!3d-26.808268400000003!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94225d00545ffb23%3A0x1970281e6399f6cc!2sFundaci%C3%B3n%20Construir%20Juntos!5e0!3m2!1ses!2sar!4v1783967262872!5m2!1ses!2sar"
                       width="100%"
                       height="400"
                       style={{ border: 0 }}
                       allowFullScreen=""
                       loading="lazy"
+                      referrerPolicy="strict-origin-when-cross-origin"
                     ></iframe>
                     <div className="home-map-label">
                       <span>Dirección</span>

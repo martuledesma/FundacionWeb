@@ -3320,6 +3320,50 @@ footer {
     color: var(--celeste-logo-hover);
 }
 
+.project-filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 28px 0 26px;
+}
+
+.project-filter-tabs button {
+    min-height: 40px;
+    padding: 9px 16px;
+    border: 1px solid rgba(var(--celeste-logo-rgb), 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--celeste-logo-hover);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 900;
+    box-shadow: 3px 3px 0 rgba(var(--celeste-logo-rgb), 0.12);
+    transition: var(--transicion);
+}
+
+.project-filter-tabs button:hover,
+.project-filter-tabs button:focus-visible,
+.project-filter-tabs button.active {
+    border-color: var(--amarillo-logo);
+    background: var(--amarillo-logo);
+    color: var(--blanco);
+    box-shadow: 4px 4px 0 rgba(var(--celeste-logo-rgb), 0.22);
+    transform: translateY(-2px);
+}
+
+.project-empty-state {
+    margin-top: 26px;
+    padding: 22px;
+    border: 1px solid rgba(var(--celeste-logo-rgb), 0.18);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--tinta-suave);
+    font-weight: 800;
+    text-align: center;
+    box-shadow: 5px 5px 0 rgba(var(--celeste-logo-rgb), 0.12);
+}
+
 .team-grid {
     max-width: none;
     gap: 18px;
@@ -3552,6 +3596,18 @@ footer {
     font-family: 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
     font-size: clamp(1.9rem, 3.6vw, 3.35rem);
     line-height: 1;
+}
+
+.alliances-header h2.display-subtitle.alliances-title {
+    max-width: 620px;
+    margin-top: 8px;
+    color: #fffdf8;
+    font-family: 'Trebuchet MS', 'Segoe UI', Arial, sans-serif;
+    font-size: clamp(2.55rem, 5.2vw, 5rem);
+    font-weight: 900;
+    line-height: 0.94;
+    letter-spacing: 0;
+    text-transform: uppercase;
 }
 
 .alliances-grid {
@@ -4465,5 +4521,492 @@ h2.display-subtitle.display-subtitle-dark .title-line-blue {
         text-shadow:
             3px 3px 0 rgba(var(--amarillo-logo-rgb), 0.86),
             0 9px 18px rgba(var(--amarillo-logo-rgb), 0.14);
+    }
+}
+
+/* TEMA VISUAL INSPIRADO EN PIEZAS DE REDES */
+:root {
+    --azul-principal: #319bd0;
+    --celeste-logo: #3fa6dc;
+    --celeste-logo-hover: #258bc1;
+    --celeste-logo-rgb: 63, 166, 220;
+    --amarillo-logo: #f7bd55;
+    --amarillo-logo-hover: #df9f32;
+    --amarillo-logo-rgb: 247, 189, 85;
+    --amarillo-texto: #1f2528;
+    --crema-home: #f6f2ea;
+    --gris-fondo: #f8f4ec;
+    --texto-oscuro: #24323a;
+    --papel: #fbf8f0;
+    --tinta-suave: #607078;
+}
+
+body,
+.App {
+    background:
+        radial-gradient(circle at 10% 8%, rgba(255, 255, 255, 0.78), transparent 24%),
+        radial-gradient(circle at 84% 18%, rgba(var(--amarillo-logo-rgb), 0.18), transparent 22%),
+        linear-gradient(90deg, rgba(38, 126, 174, 0.035) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(38, 126, 174, 0.03) 1px, transparent 1px),
+        var(--papel);
+    background-size: auto, auto, 46px 46px, 46px 46px, auto;
+    color: var(--texto-oscuro);
+}
+
+.navbar {
+    background: rgba(251, 248, 240, 0.94);
+    border-bottom: 1px solid rgba(var(--celeste-logo-rgb), 0.16);
+    box-shadow: 0 10px 30px rgba(33, 89, 118, 0.08);
+}
+
+.navbar.navbar-scrolled {
+    background: rgba(251, 248, 240, 0.76);
+}
+
+.nav-links a {
+    color: #25343b;
+}
+
+.home-hero,
+.page-hero-photo,
+.nosotros-hero.page-hero-photo,
+.sumate-hero.page-hero-photo {
+    background-color: var(--celeste-logo);
+    background-blend-mode: normal;
+}
+
+.home-hero::before,
+.page-hero-photo::before,
+.nosotros-hero.page-hero-photo::before,
+.sumate-hero.page-hero-photo::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 0;
+    height: 34%;
+    background:
+        linear-gradient(176deg, transparent 0 33%, rgba(251, 248, 240, 0.98) 34% 100%),
+        linear-gradient(180deg, transparent, rgba(251, 248, 240, 0.92));
+    pointer-events: none;
+}
+
+.home-hero::after,
+.page-hero-photo::after,
+.nosotros-hero.page-hero-photo::after,
+.sumate-hero.page-hero-photo::after {
+    height: 100%;
+    background:
+        linear-gradient(90deg, rgba(8, 45, 68, 0.72), rgba(20, 98, 138, 0.24) 48%, rgba(247, 189, 85, 0.14)),
+        radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.22), transparent 24%);
+}
+
+.home-hero-content,
+.page-hero-photo .page-hero-content,
+.nosotros-hero.page-hero-photo .nosotros-hero-content,
+.sumate-hero.page-hero-photo .sumate-hero-content {
+    z-index: 2;
+}
+
+.home-eyebrow,
+.page-eyebrow,
+.home-dark-info > span,
+.project-section-heading span,
+.team-carousel-header span,
+.team-carousel-intro span,
+.alliances-header span,
+.courses-carousel-header span,
+.courses-gallery-header span {
+    color: var(--celeste-logo);
+    letter-spacing: 0;
+}
+
+.home-eyebrow,
+.page-eyebrow {
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: 4px 4px 0 rgba(var(--amarillo-logo-rgb), 0.82);
+}
+
+.home-hero h1,
+.page-hero-photo h1,
+.nosotros-hero.page-hero-photo h1,
+.sumate-hero.page-hero-photo h1 {
+    color: #fffdf8;
+    font-weight: 900;
+    text-transform: uppercase;
+    -webkit-text-fill-color: #fffdf8;
+    -webkit-text-stroke: 2px var(--celeste-logo);
+    text-shadow:
+        3px 3px 0 rgba(var(--celeste-logo-rgb), 0.96),
+        7px 7px 0 rgba(var(--amarillo-logo-rgb), 0.82),
+        0 18px 38px rgba(14, 54, 76, 0.24);
+}
+
+.home-hero p,
+.page-hero-photo p,
+.nosotros-hero.page-hero-photo p,
+.sumate-hero.page-hero-photo p {
+    color: #f6fbff;
+    font-weight: 800;
+    text-shadow: 0 2px 14px rgba(12, 54, 78, 0.42);
+}
+
+.page-hero-card {
+    border-color: rgba(255, 255, 255, 0.52);
+    background: rgba(255, 253, 248, 0.9);
+    box-shadow:
+        6px 6px 0 rgba(var(--amarillo-logo-rgb), 0.82),
+        0 22px 52px rgba(13, 76, 111, 0.18);
+}
+
+.page-hero-card span {
+    color: var(--celeste-logo-hover);
+}
+
+.page-hero-card strong {
+    color: #25343b;
+}
+
+.home-shell,
+.nosotros-page,
+.sumate-page,
+.proyectos-page,
+.cursos-page,
+.page-loader {
+    background:
+        linear-gradient(90deg, rgba(63, 166, 220, 0.045) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(63, 166, 220, 0.035) 1px, transparent 1px),
+        radial-gradient(circle at 90% 8%, rgba(var(--amarillo-logo-rgb), 0.16), transparent 24%),
+        var(--papel);
+    background-size: 44px 44px, 44px 44px, auto, auto;
+}
+
+.home-action-bar,
+.home-service-card,
+.feature-card,
+.sumate-option,
+.team-carousel-intro,
+.alliance-card,
+.nosotros-text,
+.sumate-text,
+.page-intro p,
+.admin-form,
+.editor-block {
+    background: rgba(255, 255, 255, 0.86);
+    border: 1px solid rgba(var(--celeste-logo-rgb), 0.18);
+    box-shadow:
+        5px 5px 0 rgba(var(--celeste-logo-rgb), 0.12),
+        0 16px 34px rgba(33, 89, 118, 0.08);
+}
+
+h2.display-subtitle,
+.home-section-heading h2.display-subtitle,
+.project-section-heading h2.display-subtitle,
+.team-carousel-header h2.display-subtitle,
+.courses-carousel-header h2.display-subtitle,
+.courses-gallery-header h2.display-subtitle,
+.nosotros-closing-cta h2.display-subtitle,
+.home-dark-info h2.display-subtitle,
+.sumate-gallery-action h2.display-subtitle {
+    color: #fffdf8;
+    font-weight: 900;
+    text-transform: uppercase;
+    -webkit-text-fill-color: #fffdf8;
+    -webkit-text-stroke: 1.55px var(--celeste-logo);
+    text-shadow:
+        4px 4px 0 rgba(var(--celeste-logo-rgb), 0.92),
+        0 12px 24px rgba(24, 92, 132, 0.14);
+}
+
+h2.display-subtitle .title-line-blue,
+h2.display-subtitle .title-line-white {
+    color: #fffdf8;
+    -webkit-text-fill-color: #fffdf8;
+    -webkit-text-stroke: 1.55px var(--celeste-logo);
+    text-shadow:
+        4px 4px 0 rgba(var(--celeste-logo-rgb), 0.92),
+        0 12px 24px rgba(24, 92, 132, 0.14);
+}
+
+h2.display-subtitle .title-line-orange {
+    color: #fffdf8;
+    -webkit-text-fill-color: #fffdf8;
+    -webkit-text-stroke: 1.55px var(--amarillo-logo);
+    text-shadow:
+        4px 4px 0 rgba(var(--amarillo-logo-rgb), 0.95),
+        0 12px 24px rgba(162, 104, 18, 0.14);
+}
+
+.home-section-heading:not(.home-section-heading-light) h2.display-subtitle .title-line-white,
+.project-section-heading h2.display-subtitle .title-line-white,
+.team-carousel-header h2.display-subtitle .title-line-white,
+.courses-carousel-header h2.display-subtitle,
+.courses-gallery-header h2.display-subtitle {
+    -webkit-text-stroke-color: var(--amarillo-logo);
+    text-shadow:
+        4px 4px 0 rgba(var(--amarillo-logo-rgb), 0.95),
+        0 12px 24px rgba(162, 104, 18, 0.14);
+}
+
+.section-title,
+.section-subtitle,
+.sumate-option h3,
+.feature-card h2,
+.projects-list-section .feature-card h2,
+.evento-info h4,
+.team-info h3,
+.alliance-card h3,
+.save-modal-content h3,
+.form-modal-content h2,
+.form-group label {
+    color: var(--celeste-logo-hover);
+}
+
+.home-stats strong,
+.home-action-item strong,
+.home-service-card h3,
+.home-dark-info h2,
+.alliances-header h2 {
+    color: #24323a;
+}
+
+.home-stats p,
+.home-service-card p,
+.feature-card p,
+.sumate-option p,
+.page-intro p,
+.nosotros-text,
+.sumate-text,
+.alliance-card p,
+.courses-carousel-header span,
+.courses-gallery-header span {
+    color: var(--tinta-suave);
+}
+
+.btn-nav,
+.home-primary-link,
+.home-action-button,
+.home-more-link,
+.home-carousel-caption a,
+.project-carousel-controls button,
+.courses-carousel-controls button {
+    background: var(--celeste-logo);
+    color: var(--blanco) !important;
+    box-shadow: 0 10px 22px rgba(var(--celeste-logo-rgb), 0.28);
+}
+
+.home-secondary-link,
+.nosotros-closing-actions a:first-child {
+    background: var(--amarillo-logo);
+    border-color: var(--amarillo-logo);
+    color: var(--amarillo-texto) !important;
+    box-shadow: 0 10px 22px rgba(var(--amarillo-logo-rgb), 0.28);
+}
+
+.home-secondary-link {
+    color: var(--blanco) !important;
+}
+
+.home-dark-section {
+    background: #0c1116;
+}
+
+.home-dark-card {
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.66)),
+        var(--papel);
+}
+
+.sumate-gallery-action,
+.info-item {
+    background: #0c1116;
+}
+
+.project-area-card,
+.project-area-card:nth-child(3) {
+    background: var(--celeste-logo);
+}
+
+.project-area-card:nth-child(2),
+.project-area-card:nth-child(4) {
+    background: var(--amarillo-logo);
+}
+
+.sumate-highlight-blue {
+    color: var(--celeste-logo);
+    -webkit-text-fill-color: var(--celeste-logo);
+    -webkit-text-stroke: 0;
+    text-shadow:
+        2px 2px 0 rgba(255, 255, 255, 0.95),
+        0 10px 20px rgba(var(--celeste-logo-rgb), 0.14);
+}
+
+.sumate-highlight-orange {
+    color: var(--amarillo-logo);
+    -webkit-text-fill-color: var(--amarillo-logo);
+    -webkit-text-stroke: 0;
+    text-shadow:
+        2px 2px 0 rgba(255, 255, 255, 0.95),
+        0 10px 20px rgba(var(--amarillo-logo-rgb), 0.16);
+}
+
+.sumate-options {
+    width: min(760px, calc(100% - 48px));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sumate-hero .page-hero-card strong {
+    color: var(--celeste-logo-hover);
+}
+
+.sumate-participation-copy span {
+    display: block;
+}
+
+.sumate-participation-copy span:first-child {
+    color: var(--amarillo-logo-hover);
+}
+
+.sumate-participation-copy span:last-child {
+    color: var(--celeste-logo-hover);
+}
+
+.nosotros-hero .page-hero-card strong {
+    color: var(--amarillo-logo-hover);
+}
+
+.team-carousel-header h2.display-subtitle .team-title-mixed {
+    display: block;
+    color: var(--amarillo-logo);
+    -webkit-text-fill-color: var(--amarillo-logo);
+    -webkit-text-stroke: 0;
+    text-shadow:
+        2px 2px 0 rgba(255, 255, 255, 0.95),
+        0 10px 20px rgba(var(--amarillo-logo-rgb), 0.16);
+}
+
+.team-carousel-header h2.display-subtitle .title-line-blue {
+    color: var(--celeste-logo);
+    -webkit-text-fill-color: var(--celeste-logo);
+    -webkit-text-stroke: 0;
+    text-shadow:
+        2px 2px 0 rgba(255, 255, 255, 0.95),
+        0 10px 20px rgba(var(--celeste-logo-rgb), 0.14);
+}
+
+.team-carousel-header h2.display-subtitle .team-title-mixed span {
+    display: inline;
+    font: inherit;
+    letter-spacing: 0;
+}
+
+.team-carousel-header h2.display-subtitle .team-title-blue-word {
+    color: var(--celeste-logo);
+    -webkit-text-fill-color: var(--celeste-logo);
+    text-shadow:
+        2px 2px 0 rgba(255, 255, 255, 0.95),
+        0 10px 20px rgba(var(--celeste-logo-rgb), 0.14);
+}
+
+.sumate-gallery-action {
+    border: 1px solid rgba(var(--celeste-logo-rgb), 0.22);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(248, 244, 236, 0.86)),
+        var(--papel);
+    color: var(--texto-oscuro);
+    box-shadow:
+        6px 6px 0 rgba(var(--amarillo-logo-rgb), 0.45),
+        0 22px 52px rgba(33, 89, 118, 0.12);
+}
+
+.sumate-gallery-action h2.display-subtitle,
+.sumate-gallery-action h2.display-subtitle.display-subtitle-dark {
+    color: #fffdf8;
+}
+
+.sumate-gallery-action p {
+    color: var(--tinta-suave);
+}
+
+.sumate-participation-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 22px 0 18px;
+}
+
+.sumate-participation-tags span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid rgba(var(--celeste-logo-rgb), 0.28);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--celeste-logo-hover);
+    font-size: 0.88rem;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 3px 3px 0 rgba(var(--celeste-logo-rgb), 0.12);
+}
+
+.sumate-participation-tags span:nth-child(2) {
+    border-color: rgba(var(--amarillo-logo-rgb), 0.58);
+    color: #9c6a13;
+    box-shadow: 3px 3px 0 rgba(var(--amarillo-logo-rgb), 0.24);
+}
+
+.sumate-participation-tags span:nth-child(3) {
+    border-color: rgba(var(--celeste-logo-rgb), 0.28);
+}
+
+footer {
+    background: #0c1116;
+}
+
+@media (max-width: 640px) {
+    .home-hero h1,
+    .page-hero-photo h1,
+    .nosotros-hero.page-hero-photo h1,
+    .sumate-hero.page-hero-photo h1 {
+        -webkit-text-stroke-width: 0.85px;
+        text-shadow:
+            3px 3px 0 rgba(var(--celeste-logo-rgb), 0.94),
+            6px 6px 0 rgba(var(--amarillo-logo-rgb), 0.72),
+            0 14px 28px rgba(14, 54, 76, 0.22);
+    }
+
+    h2.display-subtitle,
+    .home-section-heading h2.display-subtitle,
+    .project-section-heading h2.display-subtitle,
+    .team-carousel-header h2.display-subtitle,
+    .courses-carousel-header h2.display-subtitle,
+    .courses-gallery-header h2.display-subtitle,
+    .nosotros-closing-cta h2.display-subtitle,
+    .home-dark-info h2.display-subtitle,
+    .sumate-gallery-action h2.display-subtitle {
+        -webkit-text-stroke-width: 0.85px;
+    }
+
+    .sumate-highlight-blue,
+    .sumate-highlight-orange {
+        -webkit-text-stroke: 0;
+        text-shadow:
+            1.5px 1.5px 0 rgba(255, 255, 255, 0.95),
+            0 8px 16px rgba(24, 92, 132, 0.12);
+    }
+
+    .sumate-options {
+        width: calc(100% - 36px);
+        grid-template-columns: 1fr;
+    }
+
+    .sumate-participation-tags {
+        gap: 8px;
+    }
+
+    .sumate-participation-tags span {
+        min-height: 34px;
+        padding: 8px 11px;
+        font-size: 0.8rem;
     }
 }

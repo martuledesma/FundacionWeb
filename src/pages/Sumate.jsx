@@ -82,7 +82,7 @@ const Sumate = () => {
       <header
         className="sumate-hero page-hero-photo"
         style={heroImage ? {
-          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+          backgroundImage: `linear-gradient(90deg, rgba(13, 76, 111, 0.54), rgba(255, 255, 255, 0.08) 46%, rgba(246, 189, 79, 0.16)), url('${heroImage}')`,
         } : undefined}
       >
         <div className="sumate-hero-content">
@@ -95,7 +95,10 @@ const Sumate = () => {
           </div>
           <div className="page-hero-card">
             <span>Participación</span>
-            <strong>Voluntariado, donaciones y difusión para llegar más lejos.</strong>
+            <strong className="sumate-participation-copy">
+              <span>Voluntariado, donaciones y difusión</span>
+              <span>para llegar más lejos.</span>
+            </strong>
           </div>
         </div>
       </header>
@@ -105,12 +108,9 @@ const Sumate = () => {
           {content.content ? (
             <p className="sumate-highlight-text">{content.content}</p>
           ) : (
-            <p className="sumate-highlight-text" aria-label="Tu ayuda es fundamental para seguir transformando Yerba Buena. Podés colaborar como voluntario o con donaciones.">
+            <p className="sumate-highlight-text" aria-label="Tu ayuda es fundamental para seguir transformando Yerba Buena.">
               <span className="sumate-highlight-line sumate-highlight-blue">
                 Tu ayuda es fundamental para seguir transformando Yerba Buena.
-              </span>
-              <span className="sumate-highlight-line sumate-highlight-orange">
-                Podés colaborar como voluntario o con donaciones.
               </span>
             </p>
           )}
@@ -120,24 +120,6 @@ const Sumate = () => {
             </p>
           )}
         </div>
-      </section>
-
-      <section className="sumate-options" aria-label="Formas de participar">
-        <article className="sumate-option">
-          <span className="sumate-option-icon">V</span>
-          <h3>Voluntariado</h3>
-          <p>Acompañá actividades, talleres y acciones comunitarias con tu tiempo.</p>
-        </article>
-        <article className="sumate-option">
-          <span className="sumate-option-icon">D</span>
-          <h3>Donaciones</h3>
-          <p>Sumá alimentos, ropa, útiles o recursos para sostener los proyectos.</p>
-        </article>
-        <article className="sumate-option">
-          <span className="sumate-option-icon">+</span>
-          <h3>Difusión</h3>
-          <p>Ayudanos a llegar a más familias compartiendo nuestras campañas.</p>
-        </article>
       </section>
 
       <section className="sumate-gallery" aria-label="Fotos de la fundación">
@@ -184,6 +166,11 @@ const Sumate = () => {
             <span className="title-line title-line-blue">¿Querés</span>
             <span className="title-line title-line-white">participar?</span>
           </h2>
+          <div className="sumate-participation-tags" aria-label="Formas de participar">
+            <span>Voluntariado</span>
+            <span>Donaciones</span>
+            <span>Difusión</span>
+          </div>
           <p>Completá tus datos y nos pondremos en contacto para coordinar cómo podés sumarte.</p>
           <button type="button" className="btn-nav sumate-form-button" onClick={() => setIsFormOpen(true)}>
             Completar formulario

@@ -78,7 +78,7 @@ function Nosotros() {
       <header
         className="nosotros-hero page-hero-photo"
         style={heroImage ? {
-          backgroundImage: `linear-gradient(90deg, rgba(18, 24, 28, 0.78), rgba(18, 24, 28, 0.28)), url('${heroImage}')`,
+          backgroundImage: `linear-gradient(90deg, rgba(13, 76, 111, 0.54), rgba(255, 255, 255, 0.08) 46%, rgba(246, 189, 79, 0.16)), url('${heroImage}')`,
         } : undefined}
       >
         <div className="nosotros-hero-content">
@@ -103,7 +103,10 @@ function Nosotros() {
             <span>Nosotros</span>
             <h2 className="display-subtitle">
               <span className="title-line title-line-blue">Las personas</span>
-              <span className="title-line title-line-orange">detrás de cada proyecto</span>
+              <span className="title-line title-line-orange team-title-mixed">
+                <span>detrás de cada </span>
+                <span className="team-title-blue-word">proyecto</span>
+              </span>
             </h2>
           </div>
           <div className="team-carousel-controls">
@@ -155,7 +158,10 @@ function Nosotros() {
       <section className="alliances-section" aria-labelledby="alliances-title">
         <div className="alliances-header">
           <span>Red de apoyo</span>
-          <h2 id="alliances-title">Nuestras alianzas</h2>
+          <h2 id="alliances-title" className="display-subtitle alliances-title">
+            <span className="title-line title-line-blue">Nuestras</span>
+            <span className="title-line title-line-orange">alianzas</span>
+          </h2>
         </div>
         <div className="alliances-grid">
           {alliances.map((alliance, index) => {
